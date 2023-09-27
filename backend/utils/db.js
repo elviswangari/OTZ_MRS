@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 require('dotenv').config();
-import {
+const {
     Vitals,
     Lab,
     Appointments,
     Pharmacy,
     Person,
-} from '../model';
+} = require('../model/RocDbModel');
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -228,7 +228,7 @@ const Roc = new PersonService()
 const Nutrition = new VitalsService()
 const LabOrders = new LabService()
 const AppointmentDir = new AppointmentsService()
-export {
+module.exports = {
     Roc,
     Nutrition,
     LabOrders,
