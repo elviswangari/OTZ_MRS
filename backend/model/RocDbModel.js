@@ -1,6 +1,69 @@
 const mongoose = require('mongoose');
 
-// Schema for person
+// Schema for Vitals
+const vitalsSchema = new mongoose.Schema({
+  cccNumber: {
+    type: Number,
+    required: true,
+    min: 1e9,
+    max: 1e10 - 1,
+  },
+  weight: {
+    type: Number,
+    required: true,
+  },
+  height: {
+    type: Number,
+    required: true,
+  },
+  bloodPressure: {
+    type: String,
+  },
+});
+
+// Schema for Lab
+const labSchema = new mongoose.Schema({
+  cccNumber: {
+    type: Number,
+    required: true,
+  },
+  viralLoad: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+  },
+});
+
+// Schema for Appointments
+const appointmentsSchema = new mongoose.Schema({
+  cccNumber: {
+    type: Number,
+    required: true,
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
+});
+
+// Schema for Pharmacy
+const pharmacySchema = new mongoose.Schema({
+  cccNumber: {
+    type: Number,
+    required: true,
+    min: 1e9,
+    max: 1e10 - 1,
+  },
+  regimen: {
+    type: String,
+    required: true,
+  },
+  dateStarted: {
+    type: Date,
+    required: true,
+  },
+});
+
+// Schema for Person
 const personSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -28,6 +91,9 @@ const personSchema = new mongoose.Schema({
   cccNumber: {
     type: Number,
     required: true,
+    unique: true,
+    min: 1e9,
+    max: 1e10 - 1,
   },
   dateEnrolledIntoCare: {
     type: Date,
@@ -49,62 +115,35 @@ const personSchema = new mongoose.Schema({
   schoolLevel: {
     type: String,
   },
-});
-
-// Schema for vitals
-const vitalsSchema = new mongoose.Schema({
-  weight: {
-    type: Number,
-    required: true,
-  },
-  height: {
-    type: Number,
-    required: true,
-  },
-  bloodPressure: {
-    type: String,
-  },
-});
-
-// Schema for lab
-const labSchema = new mongoose.Schema({
-  viralLoad: {
-    type: mongoose.Schema.Types.Mixed,
-    required: true,
-  },
-});
-
-// Schema for appointments
-const appointmentsSchema = new mongoose.Schema({
-  date: {
-    type: Date,
-    required: true,
-  },
-});
-
-// Schema for pharmacy
-const pharmacySchema = new mongoose.Schema({
-  regimen: {
-    type: String,
-    required: true,
-  },
-  dateStarted: {
-    type: Date,
-    required: true,
-  },
+  vitals: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Vitals',
+  }],
+  labs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Lab',
+  }],
+  appointments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Appointments',
+  }],
+  pharmacy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Pharmacy',
+  }],
 });
 
 // Export the models
-const Person = mongoose.model('Person', personSchema);
-const Vitals = mongoose.model('Vitals', vitalsSchema);
+const Vitals = mongoose.model('Vital', vitalsSchema);
 const Lab = mongoose.model('Lab', labSchema);
-const Appointments = mongoose.model('Appointments', appointmentsSchema);
+const Appointments = mongoose.model('Appointment', appointmentsSchema);
 const Pharmacy = mongoose.model('Pharmacy', pharmacySchema);
+const Person = mongoose.model('Person', personSchema);
 
 module.exports = {
-  Person,
   Vitals,
   Lab,
   Appointments,
   Pharmacy,
+  Person,
 };
