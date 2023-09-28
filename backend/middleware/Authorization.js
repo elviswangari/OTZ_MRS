@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
 function Jwt(req, res, next) {
@@ -39,4 +40,4 @@ function Jwt(req, res, next) {
     }
 }
 
-module.exports = Jwt
+module.exports = Jwt;

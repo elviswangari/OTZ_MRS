@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express();
 require('dotenv').config();
+const Jwt = require('./middleware/Authorization')
 const rocRoutes = require('./routes/rocRoutes');
 const hcwRoutes = require('./routes/hcwRoutes');
 
@@ -16,6 +17,8 @@ app.get('/', (req, res) => {
         message: "server homepage"
     })
 })
+
+// app.use(Jwt)
 app.use('/roc', rocRoutes);
 app.use('/hcw', hcwRoutes);
 

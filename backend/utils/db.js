@@ -6,13 +6,17 @@ const {
     Appointments,
     Pharmacy,
     Person,
-} = require('../model/RocDbModel');
+    
+} = require('../model/DbModel');
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
 class PersonService {
+    constructor(mongoose) {
+        this.Person = mongoose.model('Person', Person.schema);
+    }
     async createPerson(personData) {
         try {
             const newPerson = new Person(personData);
@@ -57,6 +61,10 @@ class PersonService {
 }
 
 class VitalsService {
+    constructor(mongoose) {
+        this.Person = mongoose.model('Person', Person.schema);
+        this.Vitals = mongoose.model('Vitals', Vitals.schema);
+    }
     async createVitalsForPerson(cccNumber, vitalsData) {
         try {
             const person = await Person.findOne({ cccNumber }).exec();
@@ -116,6 +124,10 @@ class VitalsService {
 }
 
 class LabService {
+    constructor(mongoose) {
+        this.Person = mongoose.model('Person', Person.schema);
+        this.Lab = mongoose.model('Lab', Lab.schema);
+    }
     async createLabForPerson(cccNumber, labData) {
         try {
             const person = await Person.findOne({ cccNumber }).exec();
@@ -175,6 +187,10 @@ class LabService {
 }
 
 class AppointmentsService {
+    constructor(mongoose) {
+        this.Person = mongoose.model('Person', Person.schema);
+        this.Appointments = mongoose.model('Appointments', Appointments.schema);
+    }
     async createAppointmentForPerson(cccNumber, appointmentData) {
         try {
             const person = await Person.findOne({ cccNumber }).exec();
@@ -233,13 +249,83 @@ class AppointmentsService {
     }
 }
 
-const Roc = new PersonService()
-const Nutrition = new VitalsService()
-const LabOrders = new LabService()
-const AppointmentDir = new AppointmentsService()
+class PharmacyService {
+    constructor(mongoose) {
+        this.Person = mongoose.model('Person', Person.schema);
+        this.Pharmacy = mongoose.model('Pharmacy', Pharmacy.schema);
+    }
+
+    async createPharmacyForPerson(cccNumber, pharmacyData) {
+        try {
+            const person = await this.Person.findOne({ cccNumber }).exec();
+            if (!person) {
+                throw new Error('Person not found');
+            }
+
+            const newPharmacy = new this.Pharmacy(pharmacyData);
+            person.pharmacies.push(newPharmacy);
+
+            await newPharmacy.save();
+            await person.save();
+
+            return newPharmacy;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async findPharmaciesForPerson(cccNumber) {
+        try {
+            const person = await this.Person.findOne({ cccNumber }).populate('pharmacies').exec();
+            return person ? person.pharmacies : [];
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async updatePharmacyForPerson(pharmacyId, updatedData) {
+        try {
+            return await this.Pharmacy.findByIdAndUpdate(pharmacyId, updatedData, { new: true }).exec();
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async deletePharmacyForPerson(pharmacyId, cccNumber) {
+        try {
+            const person = await this.Person.findOne({ cccNumber }).exec();
+            if (!person) {
+                throw new Error('Person not found');
+            }
+
+            const pharmacyIndex = person.pharmacies.indexOf(pharmacyId);
+            if (pharmacyIndex === -1) {
+                throw new Error('Pharmacy record not found for this person');
+            }
+
+            person.pharmacies.splice(pharmacyIndex, 1);
+            await person.save();
+
+            return await this.Pharmacy.findByIdAndDelete(pharmacyId).exec();
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+}
+
+const Roc = new PersonService(mongoose)
+const Nutrition = new VitalsService(mongoose)
+const LabOrders = new LabService(mongoose)
+const AppointmentDir = new AppointmentsService(mongoose)
+const PhamacyDir = new PharmacyService(mongoose)
 module.exports = {
     Roc,
     Nutrition,
     LabOrders,
     AppointmentDir,
+    PhamacyDir,
 };

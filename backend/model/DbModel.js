@@ -133,12 +133,22 @@ const personSchema = new mongoose.Schema({
   }],
 });
 
+const userSchema = new mongoose.Schema({
+  firstName: { type: String, required: true },
+  cccNumber: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  phoneNumber: { type: String, required: true },
+  password: { type: String, required: true },
+});
+
+
 // Export the models
 const Vitals = mongoose.model('Vital', vitalsSchema);
 const Lab = mongoose.model('Lab', labSchema);
 const Appointments = mongoose.model('Appointment', appointmentsSchema);
 const Pharmacy = mongoose.model('Pharmacy', pharmacySchema);
 const Person = mongoose.model('Person', personSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = {
   Vitals,
@@ -146,4 +156,5 @@ module.exports = {
   Appointments,
   Pharmacy,
   Person,
+  User
 };
