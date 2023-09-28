@@ -38,6 +38,15 @@ class PersonService {
         }
     }
 
+    async nbusers() {
+        try {
+            const usersCount = await Person.countDocuments({});
+            return usersCount;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async deletePersonByCCCNumber(cccNumber) {
         try {
             return await Person.findOneAndDelete({ cccNumber }).exec();

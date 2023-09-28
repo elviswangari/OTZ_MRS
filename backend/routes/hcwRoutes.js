@@ -6,6 +6,6 @@ const HcwController = require('../controllers/HcwController');
 router.get('/', HcwController.home)
   .get('/status', AppController.getStatus)
   .get('/stats', AppController.getStats)
-  .get('/users', HcwController.getUser);
+  .get('/users', HcwController.getNoOfUser);
 
 module.exports = router;
