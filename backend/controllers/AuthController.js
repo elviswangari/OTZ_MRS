@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const {User} = require('../model/DbModel');
+const { User } = require('../model/DbModel');
+const redisClient = require('../utils/redis');
+const config = require('../config');
 
 const register = async (req, res) => {
     try {
@@ -30,7 +32,13 @@ const register = async (req, res) => {
         const newUser = new User({ firstName, cccNumber, email, phoneNumber, password: hashedPassword });
         await newUser.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        // After successful registration, generate an authentication token
+        const token = jwt.sign({ userId: newUser._id }, config.SECRET_KEY, { expiresIn: '1h' });
+
+        // Store the authentication token in the cache
+        redisClient.setAuthToken(token, newUser._id);
+
+        res.status(201).json({ message: 'User registered successfully', token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
@@ -50,7 +58,11 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid identifier or password' });
         }
 
+        // After successful login, generate an authentication token
         const token = jwt.sign({ userId: user._id }, config.SECRET_KEY, { expiresIn: '1h' });
+
+        // Store the authentication token in the cache
+        redisClient.setAuthToken(token, user._id);
 
         res.json({ token });
     } catch (error) {

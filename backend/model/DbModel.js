@@ -19,7 +19,10 @@ const vitalsSchema = new mongoose.Schema({
   bloodPressure: {
     type: String,
   },
-});
+},
+  {
+    timestamps: true,
+  });
 
 // Schema for Lab
 const labSchema = new mongoose.Schema({
@@ -31,7 +34,10 @@ const labSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     required: true,
   },
-});
+},
+  {
+    timestamps: true,
+  });
 
 // Schema for Appointments
 const appointmentsSchema = new mongoose.Schema({
@@ -43,7 +49,10 @@ const appointmentsSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+},
+  {
+    timestamps: true,
+  });
 
 // Schema for Pharmacy
 const pharmacySchema = new mongoose.Schema({
@@ -61,7 +70,10 @@ const pharmacySchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+},
+  {
+    timestamps: true,
+  });
 
 // Schema for Person
 const personSchema = new mongoose.Schema({
@@ -115,23 +127,15 @@ const personSchema = new mongoose.Schema({
   schoolLevel: {
     type: String,
   },
-  vitals: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Vitals',
-  }],
-  labs: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Lab',
-  }],
-  appointments: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Appointments',
-  }],
-  pharmacy: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Pharmacy',
-  }],
-});
+  vitals: [vitalsSchema],
+  labs: [labSchema],
+  appointments: [appointmentsSchema],
+  pharmacy: [pharmacySchema],
+
+},
+  {
+    timestamps: true,
+  });
 
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },

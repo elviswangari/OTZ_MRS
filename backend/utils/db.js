@@ -1,20 +1,21 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
 const {
     Vitals,
     Lab,
     Appointments,
     Pharmacy,
     Person,
-    
+
 } = require('../model/DbModel');
-mongoose.connect(process.env.DB_URL, {
+const config = require('../config');
+
+mongoose.connect(config.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
 class PersonService {
-    constructor(mongoose) {
+    constructor() {
         this.Person = mongoose.model('Person', Person.schema);
     }
     async createPerson(personData) {
@@ -61,7 +62,7 @@ class PersonService {
 }
 
 class VitalsService {
-    constructor(mongoose) {
+    constructor() {
         this.Person = mongoose.model('Person', Person.schema);
         this.Vitals = mongoose.model('Vitals', Vitals.schema);
     }
@@ -93,10 +94,27 @@ class VitalsService {
         }
     }
 
-    async updateVitalsForPerson(vitalsId, updatedData) {
+    async updateVitalsForPerson(cccNumber, vitalId, updatedData) {
         try {
-            return await Vitals.findByIdAndUpdate(vitalsId, updatedData, { new: true }).exec();
+            //set the array to empty
+            await this.Person.updateOne({ cccNumber }, { vitals: [] }).exec();
+            // Find the vital record with both cccNumber and _id
+            const updatedVitals = await this.Vitals.findOneAndUpdate(
+                { cccNumber, _id: vitalId },
+                updatedData,
+                { new: true }
+            ).exec();
+
+            if (!updatedVitals) {
+                throw new Error(`Vitals with CCC Number ${cccNumber} and ID ${vitalId} not found`);
+            }
+
+            // Repopulate the vitals array
+            await this.Person.updateOne({ cccNumber }, { $push: { vitals: updatedVitals } }).exec();
+
+            return updatedVitals;
         } catch (error) {
+            //console.error(`Error updating vitals for CCC Number ${cccNumber}: ${error.message}`);
             throw error;
         }
     }
@@ -124,7 +142,7 @@ class VitalsService {
 }
 
 class LabService {
-    constructor(mongoose) {
+    constructor() {
         this.Person = mongoose.model('Person', Person.schema);
         this.Lab = mongoose.model('Lab', Lab.schema);
     }
@@ -187,7 +205,7 @@ class LabService {
 }
 
 class AppointmentsService {
-    constructor(mongoose) {
+    constructor() {
         this.Person = mongoose.model('Person', Person.schema);
         this.Appointments = mongoose.model('Appointments', Appointments.schema);
     }
@@ -250,7 +268,7 @@ class AppointmentsService {
 }
 
 class PharmacyService {
-    constructor(mongoose) {
+    constructor() {
         this.Person = mongoose.model('Person', Person.schema);
         this.Pharmacy = mongoose.model('Pharmacy', Pharmacy.schema);
     }
@@ -317,14 +335,14 @@ class PharmacyService {
     }
 }
 
-const Roc = new PersonService(mongoose)
-const Nutrition = new VitalsService(mongoose)
-const LabOrders = new LabService(mongoose)
-const AppointmentDir = new AppointmentsService(mongoose)
-const PhamacyDir = new PharmacyService(mongoose)
+const Roc = new PersonService()
+const Triage = new VitalsService()
+const LabOrders = new LabService()
+const AppointmentDir = new AppointmentsService()
+const PhamacyDir = new PharmacyService()
 module.exports = {
     Roc,
-    Nutrition,
+    Triage,
     LabOrders,
     AppointmentDir,
     PhamacyDir,

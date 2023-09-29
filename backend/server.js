@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express();
-require('dotenv').config();
+const config = require('./config');
 const Jwt = require('./middleware/Authorization')
 const rocRoutes = require('./routes/rocRoutes');
 const hcwRoutes = require('./routes/hcwRoutes');
@@ -23,7 +23,7 @@ app.use('/roc', rocRoutes);
 app.use('/hcw', hcwRoutes);
 
 // Connection
-const PORT = process.env.PORT || 5000;
+const PORT = config.PORT;
 app.listen(PORT, () => {
-    console.log(`App running in port: ${PORT}`);
+    console.log(`App running on port: ${PORT}`);
 });
