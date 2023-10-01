@@ -4,6 +4,7 @@ const config = require('./config');
 const Jwt = require('./middleware/Authorization')
 const rocRoutes = require('./routes/rocRoutes');
 const hcwRoutes = require('./routes/hcwRoutes');
+const AuthController = require('./controllers/AuthController');
 
 // Middleware Connections
 // app.use(cors())
@@ -17,6 +18,8 @@ app.get('/', (req, res) => {
         message: "server homepage"
     })
 })
+    .post('/register', AuthController.register)
+    .post('/login', AuthController.login);
 
 // app.use(Jwt)
 app.use('/roc', rocRoutes);

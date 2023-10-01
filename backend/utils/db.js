@@ -5,9 +5,12 @@ const {
     Appointments,
     Pharmacy,
     Person,
-
+    User
 } = require('../model/DbModel');
 const config = require('../config');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const redisClient = require('../utils/redis');
 
 mongoose.connect(config.DB_URL, {
     useNewUrlParser: true,
@@ -385,7 +388,7 @@ class PharmacyService {
                 throw new Error(`Pharmacy with CCC Number ${cccNumber} and ID ${pharmacyId} not found`);
             }
 
-            person.populate({ path: 'pharmacy' });
+            person.populated({ path: 'pharmacy' });
             await person.save();
 
             return updatedPharmacy;
@@ -418,15 +421,94 @@ class PharmacyService {
     }
 }
 
+class UserService {
+    constructor() {
+        this.Person = mongoose.model('Person', Person.schema);
+        this.User = mongoose.model('User', User.schema);
+    }
+    async registerUser(registrationDetails) {
+        try {
+            const { firstName, cccNumber, email, phoneNumber, password } = registrationDetails;
+
+            // Check if a person with the given CCC number and first name exists
+            const existingPerson = await this.Person.findOne({ cccNumber, firstName });
+
+            if (!existingPerson) {
+                throw new Error('Person with these details does not exist. Please contact the HCW.');
+            }
+
+            // Check if a user with the given CCC number exists
+            const existingUser = await this.User.findOne({ cccNumber });
+
+            if (existingUser) {
+                // If user exists
+                return { message: 'Account already exists. Please log in.' };
+            }
+
+            // Proceed with registration
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = new this.User({ firstName, cccNumber, email, phoneNumber, password: hashedPassword });
+            await newUser.save();
+
+            // After successful registration, generate an authentication token
+            const token = jwt.sign({ userId: newUser._id }, config.SECRET_KEY, { expiresIn: '1h' });
+
+            // Store the authentication token in the cache
+            redisClient.setAuthToken(token, newUser._id);
+
+            return { message: 'User registered successfully', token };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async login(identifier, password) {
+        try {
+            // Check if a user with the given identifier exists
+            const user = await this.User.findOne({
+                $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
+            });
+
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            // Check if the provided password matches the stored hashed password
+            const passwordMatch = await bcrypt.compare(password, user.password);
+
+            if (!passwordMatch) {
+                throw new Error('Incorrect password');
+            }
+
+            // Check if a valid token exists in the cache
+            const existingToken = await redisClient.getAuthToken(user._id);
+
+            if (existingToken) {
+                return { token: existingToken, userId: user._id };
+            }
+            // After successful login, generate an authentication token
+            const token = jwt.sign({ userId: user._id }, config.SECRET_KEY, { expiresIn: '1h' });
+
+            // Store the authentication token in the cache
+            redisClient.setAuthToken(token, user._id);
+
+            return { token, userId: user._id };
+        } catch (error) {
+            throw error;
+        }
+    }
+}
 const Roc = new PersonService()
 const Triage = new VitalsService()
 const LabOrders = new LabService()
 const AppointmentDir = new AppointmentsService()
 const PharmacyDir = new PharmacyService()
+const Users = new UserService();
 module.exports = {
     Roc,
     Triage,
     LabOrders,
     AppointmentDir,
     PharmacyDir,
+    Users,
 };

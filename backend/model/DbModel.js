@@ -150,7 +150,7 @@ const personSchema = new mongoose.Schema({
 
 const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
-  cccNumber: { type: String, required: true, unique: true },
+  cccNumber: { type: Number, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true },
   password: { type: String, required: true },
@@ -171,5 +171,5 @@ module.exports = {
   Appointments,
   Pharmacy,
   Person,
-  User
+  User,
 };

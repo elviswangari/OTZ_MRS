@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const redisClient = require('../utils/redis');  // Assuming you have a Redis client
+const redisClient = require('../utils/redis');
+const { internalError } = require('../utils/errors');
 
 function Jwt(req, res, next) {
     const authorization = req.headers.authorization;
@@ -36,10 +37,7 @@ function Jwt(req, res, next) {
             next();
         });
     } catch (error) {
-        res.status(500).json({
-            message: 'Internal server Error',
-            error: error.message,
-        });
+        internalError(error, res);
     }
 }
 

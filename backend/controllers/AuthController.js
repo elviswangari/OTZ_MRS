@@ -1,73 +1,45 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const { User } = require('../model/DbModel');
-const redisClient = require('../utils/redis');
-const config = require('../config');
+const { Users } = require('../utils/db');
+const { internalError } = require('../utils/errors');
 
 const register = async (req, res) => {
     try {
-        const { firstName, cccNumber, email, phoneNumber, password } = req.body;
+        const newUser = await Users.registerUser(req.body);
 
-        // Check if a user with the given CCC number exists
-        const existingUser = await User.findOne({ cccNumber });
+        res.status(201).json({
+            message: newUser.message,
+            token: newUser.token,
+            userId: newUser.userId,
+        });
 
-        if (!existingUser) {
-            return res.status(400).json({ message: 'User with this CCC number does not exist. Please contact the HCW.' });
-        }
-
-        // Check if the provided first name matches the existing user's first name
-        if (firstName !== existingUser.firstName) {
-            return res.status(400).json({ message: 'First name does not match the existing user details. Please contact the HCW.' });
-        }
-
-        // Check if the provided CCC number and name match the database
-        const isMatch = await bcrypt.compare(cccNumber, existingUser.cccNumber);
-
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Please enter valid details. If you believe there is an issue, contact the HCW.' });
-        }
-
-        // Proceed with registration
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ firstName, cccNumber, email, phoneNumber, password: hashedPassword });
-        await newUser.save();
-
-        // After successful registration, generate an authentication token
-        const token = jwt.sign({ userId: newUser._id }, config.SECRET_KEY, { expiresIn: '1h' });
-
-        // Store the authentication token in the cache
-        redisClient.setAuthToken(token, newUser._id);
-
-        res.status(201).json({ message: 'User registered successfully', token });
+        // Redirect to the "/roc" route upon successful registration
+        res.redirect('/roc');
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        // Log the error for debugging purposes (don't expose sensitive details)
+        console.error('Error during registration:', error);
+
+        // Provide a generic error message to the user
+        internalError('An error occurred during registration', res);
     }
 };
+
 
 const login = async (req, res) => {
     try {
         const { identifier, password } = req.body;
+        const authResult = await Users.login(identifier, password);
 
-        // Check if a user with the given identifier exists
-        const user = await User.findOne({
-            $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
+        res.status(200).json({
+            message: 'Login successful',
+            token: authResult.token,
+            userId: authResult.userId,
         });
-
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ message: 'Invalid identifier or password' });
-        }
-
-        // After successful login, generate an authentication token
-        const token = jwt.sign({ userId: user._id }, config.SECRET_KEY, { expiresIn: '1h' });
-
-        // Store the authentication token in the cache
-        redisClient.setAuthToken(token, user._id);
-
-        res.json({ token });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        // Log the error for debugging purposes (don't expose sensitive details)
+        console.error('Error during login:', error);
+
+        // Provide a generic error message to the user
+        internalError('An error occurred during login', res);
     }
 };
 

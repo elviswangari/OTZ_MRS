@@ -1,24 +1,32 @@
-const redis = require('redis');
+const { createClient } = require('redis');
+const { promisify } = require('util');
 
 class RedisClient {
   constructor() {
-    this.client = redis.createClient();
+    this.client = createClient();
+
+    // Promisify relevant Redis functions
+    this.client.setAsync = promisify(this.client.set).bind(this.client);
+    this.client.getAsync = promisify(this.client.get).bind(this.client);
   }
 
-  setAuthToken(token, userId, expirationTime = 3600) {
-    this.client.setex(`auth:${token}`, expirationTime, userId);
+  async setAuthToken(token, userId, expirationTime = 3600) {
+    try {
+      await this.client.setAsync(`auth:${token}`, userId, 'EX', expirationTime);
+    } catch (error) {
+      console.error('Error setting auth token:', error);
+      throw error;
+    }
   }
 
-  getAuthToken(token, callback) {
-    this.client.get(`auth:${token}`, (err, userId) => {
-      if (err) {
-        console.error(err);
-        callback(err, null);
-        return;
-      }
-
-      callback(null, userId || null);
-    });
+  async getAuthToken(token) {
+    try {
+      const userId = await this.client.getAsync(`auth:${token}`);
+      return userId || null;
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      throw error;
+    }
   }
 }
 

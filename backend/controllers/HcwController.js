@@ -1,5 +1,5 @@
 const { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir } = require('../utils/db');
-const { internalError } = require('../utils/errors')
+const { internalError } = require('../utils/errors');
 const home = (req, res) => {
   res.status(200).json({
     message: "hcw homepage"
