@@ -10,34 +10,7 @@ const getNoOfUser = async (req, res) => {
   res.status(200).json({ users })
 };
 
-// const cleanUp = async (cccNumber) => {
-//   try {
-//     // Find the person by CCC number
-//     const person = await Roc.findPersonByCCCNumber(cccNumber);
-
-//     if (!person) {
-//       throw new Error(`Person with CCC Number ${cccNumber} not found`);
-//     }
-
-//     // Reset the arrays
-//     person.lab = [];
-//     person.vitals = [];
-//     person.pharmacy = [];
-//     person.appointment = [];
-
-//     // Save the updated person document
-//     await person.save();
-
-//     // Populate the arrays with actual documents
-//     // await person.populate('lab').populate('vitals').populate('pharmacy').populate('appointment').execPopulate();
-//     await person.execPopulate();
-//     // Return the updated person document
-//     return person;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
-
+// register new person
 const registerRoc = async (req, res) => {
   try {
     // Extract ROC data from the request body
@@ -80,11 +53,11 @@ const registerRoc = async (req, res) => {
       message: 'ROC registered successfully',
       roc: newRoc,
     });
-    // console.log(req.body);
   } catch (error) {
     internalError(error, res);
   }
 }
+// update persons record
 const updateRocRecord = async (req, res) => {
   try {
     const {
@@ -130,6 +103,7 @@ const updateRocRecord = async (req, res) => {
     internalError(error, res);
   }
 }
+// create new vitals
 const newVitals = async (req, res) => {
   try {
     // Extract ROC data from the request body
@@ -154,11 +128,12 @@ const newVitals = async (req, res) => {
       message: 'ROC record saved successfully',
       newVital,
     });
-    // console.log(req.body);
   } catch (error) {
     internalError(error, res);
   }
 }
+
+// update vitals
 const updateVitals = async (req, res) => {
   try {
     // Extract ROC data from the request body
@@ -189,7 +164,6 @@ const updateVitals = async (req, res) => {
         message: 'Vital record not found',
       });
     }
-    // console.log(req.body);
   } catch (error) {
     internalError(error, res);
   }
@@ -214,6 +188,7 @@ const deleteVitals = async (req, res) => {
   }
 }
 
+//find persons records
 const getRocRecord = async (req, res) => {
   try {
     const { cccNumber } = req.body;
