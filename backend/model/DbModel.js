@@ -34,6 +34,10 @@ const labSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     required: true,
   },
+  viralLoadDate: {
+    type: Date,
+    required: true,
+  }
 },
   {
     timestamps: true,
@@ -45,7 +49,7 @@ const appointmentsSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  date: {
+  nextVisitDay: {
     type: Date,
     required: true,
   },
@@ -66,10 +70,14 @@ const pharmacySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  dateStarted: {
+  dateStartedRegimen: {
     type: Date,
     required: true,
   },
+  regimenLine: {
+    type: String,
+    required: true,
+  }
 },
   {
     timestamps: true,
@@ -111,6 +119,10 @@ const personSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  dateStartedArt: {
+    type: Date,
+    required: true,
+  },
   dateEnrolledIntoOTZ: {
     type: Date,
     required: true,
@@ -128,10 +140,9 @@ const personSchema = new mongoose.Schema({
     type: String,
   },
   vitals: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Vitals' }],
-  labs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'labs' }],
-  appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'appointments' }],
-  pharmacy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pharmacies' }],
-
+  labs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lab' }],
+  appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Appointment' }],
+  pharmacy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pharmacy' }],
 },
   {
     timestamps: true,

@@ -1,4 +1,4 @@
-const { Roc, Triage } = require('../utils/db');
+const { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir } = require('../utils/db');
 const { internalError } = require('../utils/errors')
 const home = (req, res) => {
   res.status(200).json({
@@ -28,6 +28,7 @@ const registerRoc = async (req, res) => {
       school,
       schoolName,
       schoolLevel,
+      dateStartedArt,
     } = req.body;
 
     // Create ROC record
@@ -40,6 +41,7 @@ const registerRoc = async (req, res) => {
       phoneNumber,
       cccNumber,
       dateEnrolledIntoCare,
+      dateStartedArt,
       dateEnrolledIntoOTZ,
       work,
       school,
@@ -74,6 +76,7 @@ const updateRocRecord = async (req, res) => {
       school,
       schoolName,
       schoolLevel,
+      dateStartedArt,
     } = req.body;
 
     // Create ROC record
@@ -86,6 +89,7 @@ const updateRocRecord = async (req, res) => {
       phoneNumber,
       cccNumber,
       dateEnrolledIntoCare,
+      dateStartedArt,
       dateEnrolledIntoOTZ,
       work,
       school,
@@ -207,6 +211,253 @@ const getRocRecord = async (req, res) => {
   }
 }
 
+//lab orders
+const newLabOrder = async (req, res) => {
+  try {
+    // Extract ROC data from the request body
+    const {
+      viralLoad,
+      viralLoadDate,
+      cccNumber,
+    } = req.body;
+
+    // Create ROC vital record
+    const labData = {
+      viralLoad,
+      viralLoadDate,
+      cccNumber,
+    };
+
+    const newLab = await LabOrders.createLabForPerson(cccNumber, labData);
+
+    res.status(201).json({
+      message: 'Lab record saved successfully',
+      newLab,
+    });
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+// update lab order
+const updateLabOrder = async (req, res) => {
+  try {
+    // Extract ROC data from the request body
+    const {
+      viralLoad,
+      viralLoadDate,
+      cccNumber,
+      labId,
+    } = req.body;
+
+    // Create ROC vital record
+    const updatedLabs = {
+      viralLoad,
+      viralLoadDate,
+      cccNumber,
+      labId,
+    };
+
+    const newLab = await LabOrders.updateLabForPerson(cccNumber, labId, updatedLabs);
+    if (newLab) {
+      res.status(200).json({
+        message: 'Lab record updated successfully',
+        newLab,
+      });
+    } else {
+      res.status(404).json({
+        message: 'Lab record not found',
+      });
+    }
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+//delete laborder
+const deleteLabOrder = async (req, res) => {
+  const { cccNumber, labId } = req.body;
+  try {
+    const deletedLab = await LabOrders.deleteLabForPerson(cccNumber, labId);
+    if (deletedLab) {
+      res.status(204).json({
+        message: 'Lab record deleted successfully',
+      });
+    } else {
+      res.status(404).json({
+        message: 'Lab record not found',
+      });
+    }
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+//phamacy
+//phamacy orders
+const newPharmacyOrder = async (req, res) => {
+  try {
+    // Extract ROC data from the request body
+    const {
+      cccNumber,
+      regimen,
+      dateStartedRegimen,
+      regimenLine,
+    } = req.body;
+
+    // Create ROC vital record
+    const pharmacyData = {
+      cccNumber,
+      regimen,
+      dateStartedRegimen,
+      regimenLine,
+    };
+
+    const newPharmacy = await PharmacyDir.createPharmacyForPerson(cccNumber, pharmacyData);
+
+    res.status(201).json({
+      message: 'Pharmacy record saved successfully',
+      newPharmacy,
+    });
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+// update phamacy order
+const updatePharmacyOrder = async (req, res) => {
+  try {
+    // Extract ROC data from the request body
+    const {
+      cccNumber,
+      regimen,
+      dateStartedRegimen,
+      regimenLine,
+      pharmacyId,
+    } = req.body;
+
+    // Create ROC vital record
+    const updatedPharmacy = {
+      cccNumber,
+      regimen,
+      dateStartedRegimen,
+      regimenLine,
+      pharmacyId,
+    };
+
+    const newPharmacy = await PharmacyDir.updatePharmacyForPerson(cccNumber, pharmacyId, updatedPharmacy);
+    if (newPharmacy) {
+      res.status(200).json({
+        message: 'Pharmacy record updated successfully',
+        newPharmacy,
+      });
+    } else {
+      res.status(404).json({
+        message: 'Pharmacy record not found',
+      });
+    }
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+//delete phamacy order
+const deletePharmacyOrder = async (req, res) => {
+  const { cccNumber, pharmacyId } = req.body;
+  try {
+    const deletedPharmacy = await PharmacyDir.deletePharmacyForPerson(cccNumber, pharmacyId);
+    if (deletedPharmacy) {
+      res.status(204).json({
+        message: 'Pharmacy record deleted successfully',
+      });
+    } else {
+      res.status(404).json({
+        message: 'Lab record not found',
+      });
+    }
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+//appointments
+//appointments
+const newAppoitment = async (req, res) => {
+  try {
+    // Extract ROC data from the request body
+    const {
+      cccNumber,
+      nextVisitDay,
+    } = req.body;
+
+    // Create ROC vital record
+    const appointmentData = {
+      cccNumber,
+      nextVisitDay,
+    };
+
+    const newAppointment = await AppointmentDir.createAppointmentForPerson(cccNumber, appointmentData);
+
+    res.status(201).json({
+      message: 'Appointment record saved successfully',
+      newAppointment,
+    });
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+// update appoinment
+const updateAppoitment = async (req, res) => {
+  try {
+    // Extract ROC data from the request body
+    const {
+      cccNumber,
+      nextVisitDay,
+      appointmentId,
+    } = req.body;
+
+    // Create ROC vital record
+    const updatedAppointment = {
+      cccNumber,
+      nextVisitDay,
+      appointmentId,
+    };
+
+    const newAppointment = await AppointmentDir.updateAppointmentForPerson(cccNumber, appointmentId, updatedAppointment);
+    if (newAppointment) {
+      res.status(200).json({
+        message: 'Appointment record updated successfully',
+        newAppointment,
+      });
+    } else {
+      res.status(404).json({
+        message: 'Appointment record not found',
+      });
+    }
+  } catch (error) {
+    internalError(error, res);
+  }
+}
+
+//delete appointment order
+const deleteAppoitment = async (req, res) => {
+  const { cccNumber, appointmentId } = req.body;
+  try {
+    const deletedAppointment = await AppointmentDir.deleteAppointmentForPerson(cccNumber, appointmentId);
+    if (deletedAppointment) {
+      res.status(204).json({
+        message: 'Appointment record deleted successfully',
+      });
+    } else {
+      res.status(404).json({
+        message: 'Appointment record not found',
+      });
+    }
+  } catch (error) {
+    internalError(error, res);
+  }
+}
 
 module.exports = {
   home,
@@ -217,4 +468,13 @@ module.exports = {
   updateVitals,
   deleteVitals,
   getRocRecord,
+  newLabOrder,
+  updateLabOrder,
+  deleteLabOrder,
+  newPharmacyOrder,
+  updatePharmacyOrder,
+  deletePharmacyOrder,
+  newAppoitment,
+  updateAppoitment,
+  deleteAppoitment,
 };

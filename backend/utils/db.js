@@ -22,7 +22,7 @@ class PersonService {
         const { cccNumber } = personData;
 
         try {
-            const existingPerson = await this.Person.findOne({ cccNumber }).exec();
+            const existingPerson = await this.Person.findOne({ cccNumber });
 
             if (existingPerson) {
                 throw new Error(`Person with CCC Number ${cccNumber} already exists`);
@@ -38,7 +38,11 @@ class PersonService {
     async findPersonByCCCNumber(cccNumber) {
         try {
             // Find the person by CCC number
-            const person = await this.Person.findOne({ cccNumber }).populate({ path: 'vitals' });
+            const person = await this.Person.findOne({ cccNumber })
+                .populate('vitals')
+                .populate('labs')
+                .populate('appointments')
+                .populate('pharmacy');
 
             if (!person) {
                 throw new Error(`Person with CCC Number ${cccNumber} not found`);
@@ -51,7 +55,7 @@ class PersonService {
 
     async updatePersonByCCCNumber(cccNumber, updatedData) {
         try {
-            return await Person.findOneAndUpdate({ cccNumber }, updatedData, { new: true }).exec();
+            return await Person.findOneAndUpdate({ cccNumber }, updatedData, { new: true });
         } catch (error) {
             throw error;
         }
@@ -68,7 +72,7 @@ class PersonService {
 
     async deletePersonByCCCNumber(cccNumber) {
         try {
-            return await Person.findOneAndDelete({ cccNumber }).exec();
+            return await Person.findOneAndDelete({ cccNumber });
         } catch (error) {
             throw error;
         }
@@ -82,7 +86,7 @@ class VitalsService {
     }
     async createVitalsForPerson(cccNumber, vitalsData) {
         try {
-            const person = await Person.findOne({ cccNumber }).exec();
+            const person = await Person.findOne({ cccNumber });
             if (!person) {
                 throw new Error('Person not found');
             }
@@ -101,7 +105,7 @@ class VitalsService {
 
     async findVitalsForPerson(cccNumber) {
         try {
-            const person = await Person.findOne({ cccNumber }).populate('vitals').exec();
+            const person = await Person.findOne({ cccNumber }).populate('vitals');
             return person ? person.vitals : [];
         } catch (error) {
             throw error;
@@ -110,7 +114,7 @@ class VitalsService {
     async updateVitalsForPerson(cccNumber, vitalId, updatedData) {
         try {
             // Find the person by CCC number
-            const person = await this.Person.findOne({ cccNumber }).exec();
+            const person = await this.Person.findOne({ cccNumber });
             if (!person) {
                 throw new Error('Person not found');
             }
@@ -126,7 +130,7 @@ class VitalsService {
                 throw new Error(`Vitals with CCC Number ${cccNumber} and ID ${vitalId} not found`);
             }
 
-            person.populated({path: 'vitals'});
+            person.populated({ path: 'vitals' });
             await person.save();
 
             return updatedVitals;
@@ -136,8 +140,8 @@ class VitalsService {
     }
     async deleteVitalsForPerson(cccNumber, vitalId) {
         try {
-            const person = await this.Person.findOne({ cccNumber }).exec();
-            const vitalToDelete = await this.Vitals.findByIdAndDelete(vitalId).exec();
+            const person = await this.Person.findOne({ cccNumber });
+            const vitalToDelete = await this.Vitals.findByIdAndDelete(vitalId);
 
             if (!person || !vitalToDelete) {
                 throw new Error('Person or Vitals not found');
@@ -164,7 +168,7 @@ class LabService {
     }
     async createLabForPerson(cccNumber, labData) {
         try {
-            const person = await Person.findOne({ cccNumber }).exec();
+            const person = await Person.findOne({ cccNumber });
             if (!person) {
                 throw new Error('Person not found');
             }
@@ -183,37 +187,58 @@ class LabService {
 
     async findLabsForPerson(cccNumber) {
         try {
-            const person = await Person.findOne({ cccNumber }).populate('labs').exec();
+            const person = await Person.findOne({ cccNumber }).populate('labs');
             return person ? person.labs : [];
         } catch (error) {
             throw error;
         }
     }
 
-    async updateLabForPerson(labId, updatedData) {
+    async updateLabForPerson(cccNumber, labId, updatedData) {
         try {
-            return await Lab.findByIdAndUpdate(labId, updatedData, { new: true }).exec();
+            // Find the person by CCC number
+            const person = await this.Person.findOne({ cccNumber });
+            if (!person) {
+                throw new Error('Person not found');
+            }
+
+            // Find the lab record with both CCC number and _id
+            const updatedLabs = await this.Lab.findOneAndUpdate(
+                { cccNumber, _id: labId },
+                updatedData,
+                { new: true }
+            );
+
+            if (!updatedLabs) {
+                throw new Error(`Labs with CCC Number ${cccNumber} and ID ${labId} not found`);
+            }
+
+            person.populated({ path: 'labs' });
+            await person.save();
+
+            return updatedLabs;
         } catch (error) {
             throw error;
         }
     }
 
-    async deleteLabForPerson(labId, cccNumber) {
+    async deleteLabForPerson(cccNumber, labId) {
         try {
-            const person = await Person.findOne({ cccNumber }).exec();
-            if (!person) {
-                throw new Error('Person not found');
+            const person = await Person.findOne({ cccNumber });
+            const labToDelete = await this.Lab.findByIdAndDelete(labId);
+
+            if (!person || !labToDelete) {
+                throw new Error('Person or Labs not found');
             }
 
+            // Remove the lab from the person's array 
             const labIndex = person.labs.indexOf(labId);
-            if (labIndex === -1) {
-                throw new Error('Lab record not found for this person');
+            if (labIndex !== -1) {
+                person.labs.splice(labIndex, 1);
+                await person.save();
             }
 
-            person.labs.splice(labIndex, 1);
-            await person.save();
-
-            return await Lab.findByIdAndDelete(labId).exec();
+            return true;
         } catch (error) {
             throw error;
         }
@@ -227,7 +252,7 @@ class AppointmentsService {
     }
     async createAppointmentForPerson(cccNumber, appointmentData) {
         try {
-            const person = await Person.findOne({ cccNumber }).exec();
+            const person = await Person.findOne({ cccNumber });
             if (!person) {
                 throw new Error('Person not found');
             }
@@ -246,37 +271,59 @@ class AppointmentsService {
 
     async findAppointmentsForPerson(cccNumber) {
         try {
-            const person = await Person.findOne({ cccNumber }).populate('appointments').exec();
+            const person = await Person.findOne({ cccNumber }).populate('appointments');
             return person ? person.appointments : [];
         } catch (error) {
             throw error;
         }
     }
 
-    async updateAppointmentForPerson(appointmentId, updatedData) {
+    async updateAppointmentForPerson(cccNumber, appointmentId, updatedData) {
         try {
-            return await Appointments.findByIdAndUpdate(appointmentId, updatedData, { new: true }).exec();
+            // Find the person by CCC number
+            const person = await this.Person.findOne({ cccNumber });
+            if (!person) {
+                throw new Error('Person not found');
+            }
+
+            // Find the appointment record with both CCC number and _id
+            const updatedAppointment = await this.Appointments.findOneAndUpdate(
+                { cccNumber, _id: appointmentId },
+                updatedData,
+                { new: true }
+            );
+
+            if (!updatedAppointment) {
+                throw new Error(`Appointment with CCC Number ${cccNumber} and ID ${appointmentId} not found`);
+            }
+
+            person.populate({ path: 'appointments' });
+            await person.save();
+
+            return updatedAppointment;
         } catch (error) {
             throw error;
         }
     }
 
-    async deleteAppointmentForPerson(appointmentId, cccNumber) {
+
+    async deleteAppointmentForPerson(cccNumber, appointmentId) {
         try {
-            const person = await Person.findOne({ cccNumber }).exec();
-            if (!person) {
-                throw new Error('Person not found');
+            const person = await this.Person.findOne({ cccNumber });
+            const appointmentToDelete = await this.Appointments.findByIdAndDelete(appointmentId);
+
+            if (!person || !appointmentToDelete) {
+                throw new Error('Person or appointment not found');
             }
 
+            // Remove the appointment from the person's array 
             const appointmentIndex = person.appointments.indexOf(appointmentId);
-            if (appointmentIndex === -1) {
-                throw new Error('Appointment record not found for this person');
+            if (appointmentIndex !== -1) {
+                person.vitals.splice(appointmentIndex, 1);
+                await person.save();
             }
 
-            person.appointments.splice(appointmentIndex, 1);
-            await person.save();
-
-            return await Appointments.findByIdAndDelete(appointmentId).exec();
+            return true;
         } catch (error) {
             throw error;
         }
@@ -291,13 +338,13 @@ class PharmacyService {
 
     async createPharmacyForPerson(cccNumber, pharmacyData) {
         try {
-            const person = await this.Person.findOne({ cccNumber }).exec();
+            const person = await this.Person.findOne({ cccNumber });
             if (!person) {
                 throw new Error('Person not found');
             }
 
             const newPharmacy = new this.Pharmacy(pharmacyData);
-            person.pharmacies.push(newPharmacy);
+            person.pharmacy.push(newPharmacy);
 
             await newPharmacy.save();
             await person.save();
@@ -311,7 +358,7 @@ class PharmacyService {
 
     async findPharmaciesForPerson(cccNumber) {
         try {
-            const person = await this.Person.findOne({ cccNumber }).populate('pharmacies').exec();
+            const person = await this.Person.findOne({ cccNumber }).populate('pharmacies');
             return person ? person.pharmacies : [];
         } catch (error) {
             console.error(error);
@@ -319,31 +366,51 @@ class PharmacyService {
         }
     }
 
-    async updatePharmacyForPerson(pharmacyId, updatedData) {
+    async updatePharmacyForPerson(cccNumber, pharmacyId, updatedData) {
         try {
-            return await this.Pharmacy.findByIdAndUpdate(pharmacyId, updatedData, { new: true }).exec();
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
-    }
-
-    async deletePharmacyForPerson(pharmacyId, cccNumber) {
-        try {
-            const person = await this.Person.findOne({ cccNumber }).exec();
+            // Find the person by CCC number
+            const person = await this.Person.findOne({ cccNumber });
             if (!person) {
                 throw new Error('Person not found');
             }
 
-            const pharmacyIndex = person.pharmacies.indexOf(pharmacyId);
-            if (pharmacyIndex === -1) {
-                throw new Error('Pharmacy record not found for this person');
+            // Find the pharmacy record with both CCC number and _id
+            const updatedPharmacy = await this.Pharmacy.findOneAndUpdate(
+                { cccNumber, _id: pharmacyId },
+                updatedData,
+                { new: true }
+            );
+
+            if (!updatedPharmacy) {
+                throw new Error(`Pharmacy with CCC Number ${cccNumber} and ID ${pharmacyId} not found`);
             }
 
-            person.pharmacies.splice(pharmacyIndex, 1);
+            person.populate({ path: 'pharmacy' });
             await person.save();
 
-            return await this.Pharmacy.findByIdAndDelete(pharmacyId).exec();
+            return updatedPharmacy;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deletePharmacyForPerson(cccNumber, pharmacyId) {
+        try {
+            const person = await Person.findOne({ cccNumber });
+            const pharmacyToDelete = await this.Pharmacy.findByIdAndDelete(pharmacyId);
+
+            if (!person || !pharmacyToDelete) {
+                throw new Error('Person or pharmacy not found');
+            }
+
+            // Remove the lab from the person's array 
+            const pharmacyIndex = person.pharmacy.indexOf(pharmacyId);
+            if (pharmacyIndex !== -1) {
+                person.pharmacy.splice(pharmacyIndex, 1);
+                await person.save();
+            }
+
+            return true;
         } catch (error) {
             console.error(error);
             throw error;
