@@ -18,8 +18,59 @@ class PersonService {
     constructor() {
         this.Person = mongoose.model('Person', Person.schema);
     }
+    // async createPerson(personData) {
+    //     try {
+    //         const newPerson = new Person(personData);
+    //         return await newPerson.save();
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
+    // async findPersonByCCCNumber(cccNumber) {
+    //     try {
+    //         return await Person.findOne({ cccNumber }).exec();
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+    // async findPersonByCCCNumber(cccNumber) {
+    //     try {
+    //         // Find the person by CCC number
+    //         const person = await this.Person.findOne({ cccNumber }).exec();
+    //         console.log(person);
+    //         if (!person) {
+    //             throw new Error(`Person with CCC Number ${cccNumber} not found`);
+    //         }
+
+    //         // // Reset the arrays to empty
+    //         // person.lab = [];
+    //         // person.vitals = [];
+    //         // person.pharmacy = [];
+    //         // person.appointment = [];
+
+    //         // // Save the updated person document
+    //         // await person.save();
+
+    //         // // Populate the arrays with actual documents
+    //         // await person.populate('lab').populate('vitals').populate('pharmacy').populate('appointment').execPopulate();
+
+    //         // // Return the updated person document
+    //         return person;
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
     async createPerson(personData) {
+        const { cccNumber } = personData;
+
         try {
+            const existingPerson = await this.Person.findOne({ cccNumber }).exec();
+
+            if (existingPerson) {
+                throw new Error(`Person with CCC Number ${cccNumber} already exists`);
+            }
+
             const newPerson = new Person(personData);
             return await newPerson.save();
         } catch (error) {
@@ -29,7 +80,13 @@ class PersonService {
 
     async findPersonByCCCNumber(cccNumber) {
         try {
-            return await Person.findOne({ cccNumber }).exec();
+            // Find the person by CCC number
+            const person = await this.Person.findOne({ cccNumber }).populate({ path: 'vitals' });
+
+            if (!person) {
+                throw new Error(`Person with CCC Number ${cccNumber} not found`);
+            }
+            return person;
         } catch (error) {
             throw error;
         }
@@ -94,47 +151,108 @@ class VitalsService {
         }
     }
 
+    // async updateVitalsForPerson(cccNumber, vitalId, updatedData) {
+    //     try {
+    //         //set the array to empty
+    //         await this.Person.updateOne({ cccNumber }, { vitals: [] }).exec();
+    //         // Find the vital record with both cccNumber and _id
+    //         const updatedVitals = await this.Vitals.findOneAndUpdate(
+    //             { cccNumber, _id: vitalId },
+    //             updatedData,
+    //             { new: true }
+    //         ).exec();
+
+    //         if (!updatedVitals) {
+    //             throw new Error(`Vitals with CCC Number ${cccNumber} and ID ${vitalId} not found`);
+    //         }
+
+    //         // Repopulate the vitals array
+    //         await this.Person.updateOne({ cccNumber }, { $push: { vitals: updatedVitals } }).exec();
+
+    //         return updatedVitals;
+    //     } catch (error) {
+    //         //console.error(`Error updating vitals for CCC Number ${cccNumber}: ${error.message}`);
+    //         throw error;
+    //     }
+    // }
+
+    // async deleteVitalsForPerson(cccNumber, vitalId) {
+    //     try {
+    //         const person = await Person.findOne({ cccNumber });
+    //         const vitalToDelete = await Vitals.findOne({ cccNumber, vitalId });
+
+    //         if (!person && !vitalToDelete) {
+    //             throw new Error('Person or Vitals not found');
+    //         }
+
+    //         // If you are using an array of vitals in the Person model
+    //         // const vitalsIndex = person.vitals.indexOf(vitalId);
+    //         // if (vitalsIndex === -1) {
+    //         //     throw new Error('Vitals not found for this person');
+    //         // }
+    //         // person.vitals.splice(vitalsIndex, 1);
+    //         // await person.save();
+
+    //         // If you are directly deleting the vitals using findByIdAndDelete
+    //         return await Vitals.findByIdAndDelete(vitalId);
+    //     } catch (error) {
+    //         throw error;
+    //     }
+    // }
+
     async updateVitalsForPerson(cccNumber, vitalId, updatedData) {
         try {
-            //set the array to empty
-            await this.Person.updateOne({ cccNumber }, { vitals: [] }).exec();
-            // Find the vital record with both cccNumber and _id
+            // Find the person by CCC number
+            const person = await this.Person.findOne({ cccNumber }).exec();
+            if (!person) {
+                throw new Error('Person not found');
+            }
+
+            // Find the vital record with both CCC number and _id
             const updatedVitals = await this.Vitals.findOneAndUpdate(
                 { cccNumber, _id: vitalId },
                 updatedData,
                 { new: true }
-            ).exec();
+            );
 
             if (!updatedVitals) {
                 throw new Error(`Vitals with CCC Number ${cccNumber} and ID ${vitalId} not found`);
             }
 
+            // // Set the vitals array to empty (assuming it's an array)
+            // person.vitals = [];
+
+            // Save the person document to clear the vitals array
+            // await person.save();
+
             // Repopulate the vitals array
-            await this.Person.updateOne({ cccNumber }, { $push: { vitals: updatedVitals } }).exec();
+            // person.vitals.push(updatedVitals);
+            // await person.save();
+            person.populated({path: 'vitals'});
+            await person.save();
 
             return updatedVitals;
         } catch (error) {
-            //console.error(`Error updating vitals for CCC Number ${cccNumber}: ${error.message}`);
             throw error;
         }
     }
-
-    async deleteVitalsForPerson(vitalsId, cccNumber) {
+    async deleteVitalsForPerson(cccNumber, vitalId) {
         try {
-            const person = await Person.findOne({ cccNumber }).exec();
-            if (!person) {
-                throw new Error('Person not found');
+            const person = await this.Person.findOne({ cccNumber }).exec();
+            const vitalToDelete = await this.Vitals.findByIdAndDelete(vitalId).exec();
+
+            if (!person || !vitalToDelete) {
+                throw new Error('Person or Vitals not found');
             }
 
-            const vitalsIndex = person.vitals.indexOf(vitalsId);
-            if (vitalsIndex === -1) {
-                throw new Error('Vitals not found for this person');
+            // Remove the vital from the person's array (if applicable)
+            const vitalIndex = person.vitals.indexOf(vitalId);
+            if (vitalIndex !== -1) {
+                person.vitals.splice(vitalIndex, 1);
+                await person.save();
             }
 
-            person.vitals.splice(vitalsIndex, 1);
-            await person.save();
-
-            return await Vitals.findByIdAndDelete(vitalsId).exec();
+            return true;
         } catch (error) {
             throw error;
         }
@@ -339,11 +457,11 @@ const Roc = new PersonService()
 const Triage = new VitalsService()
 const LabOrders = new LabService()
 const AppointmentDir = new AppointmentsService()
-const PhamacyDir = new PharmacyService()
+const PharmacyDir = new PharmacyService()
 module.exports = {
     Roc,
     Triage,
     LabOrders,
     AppointmentDir,
-    PhamacyDir,
+    PharmacyDir,
 };

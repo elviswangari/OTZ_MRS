@@ -127,10 +127,10 @@ const personSchema = new mongoose.Schema({
   schoolLevel: {
     type: String,
   },
-  vitals: [vitalsSchema],
-  labs: [labSchema],
-  appointments: [appointmentsSchema],
-  pharmacy: [pharmacySchema],
+  vitals: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Vitals' }],
+  labs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'labs' }],
+  appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'appointments' }],
+  pharmacy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pharmacies' }],
 
 },
   {
