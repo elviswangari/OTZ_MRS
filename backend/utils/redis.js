@@ -14,6 +14,7 @@ class RedisClient {
   async setAuthToken(token, userId, expirationTime = 3600) {
     try {
       const userIdString = userId.toString();
+      console.log(userIdString)
       await this.client.setAsync(`auth:${token}`, userIdString, 'EX', expirationTime);
     } catch (error) {
       console.error('Error setting auth token:', error);

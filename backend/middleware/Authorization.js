@@ -65,7 +65,8 @@ const Jwt = async (req, res, next) => {
             const { userId } = await validateBearerToken(credentials, res);
 
             // Fetch additional details from the database based on the user ID
-            const user = await Users.findById(userId);
+            const user = await Users.findUserById(userId);
+            console.log(`auth.js , ${user}`);
 
             if (!user) {
                 return res.status(401).json({

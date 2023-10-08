@@ -537,6 +537,22 @@ class UserService {
         }
     }
 
+    async findUserById(userId) {
+        try {
+            const user = await this.User.findById(userId);
+            console.log(`db.js , ${user}`)
+
+            if (!user) {
+                console.error('User not found');
+                return null;
+            }
+
+            return user;
+        } catch (error) {
+            console.error('Error in findUserById:', error);
+            throw error;
+        }
+    }
 
 }
 const Roc = new PersonService()
