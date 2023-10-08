@@ -1,5 +1,6 @@
 const { createClient } = require('redis');
 const { promisify } = require('util');
+const mongoose = require('mongoose');
 
 class RedisClient {
   constructor() {
@@ -12,22 +13,25 @@ class RedisClient {
 
   async setAuthToken(token, userId, expirationTime = 3600) {
     try {
-      await this.client.setAsync(`auth:${token}`, userId, 'EX', expirationTime);
+      const userIdString = userId.toString();
+      await this.client.setAsync(`auth:${token}`, userIdString, 'EX', expirationTime);
     } catch (error) {
       console.error('Error setting auth token:', error);
       throw error;
     }
   }
 
+
   async getAuthToken(token) {
     try {
-      const userId = await this.client.getAsync(`auth:${token}`);
-      return userId || null;
+      const userIdString = await this.client.getAsync(`auth:${token}`);
+      return userIdString ? new mongoose.Types.ObjectId(userIdString) : null;
     } catch (error) {
       console.error('Error getting auth token:', error);
       throw error;
     }
   }
+
 }
 
 const redisClient = new RedisClient();

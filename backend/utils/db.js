@@ -450,13 +450,16 @@ class UserService {
             const newUser = new this.User({ firstName, cccNumber, email, phoneNumber, password: hashedPassword });
             await newUser.save();
 
+            // Log the user's _id before generating the token
+            console.log('New User _id:', newUser._id);
+
             // After successful registration, generate an authentication token
             const token = jwt.sign({ userId: newUser._id }, config.SECRET_KEY, { expiresIn: '1h' });
 
             // Store the authentication token in the cache
             redisClient.setAuthToken(token, newUser._id);
 
-            return { message: 'User registered successfully', token };
+            return { message: 'User registered successfully', token, userId: newUser._id };
         } catch (error) {
             throw error;
         }
@@ -469,12 +472,15 @@ class UserService {
                 $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
             });
 
+            // Log the user's _id before generating or retrieving the token
+            console.log('User _id:', user ? user._id : null);
+
             if (!user) {
                 throw new Error('User not found');
             }
 
             // Check if the provided password matches the stored hashed password
-            const passwordMatch = await bcrypt.compare(password, user.password);
+            const passwordMatch = await bcrypt.compare(password, user.password || '');
 
             if (!passwordMatch) {
                 throw new Error('Incorrect password');
@@ -497,6 +503,42 @@ class UserService {
             throw error;
         }
     }
+
+
+
+    async checkCreds(identifier, password) {
+        try {
+            const user = await this.User.findOne({
+                $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
+            });
+
+            if (!user) {
+                console.error('User not found');
+                throw new Error('User not found');
+            }
+
+            if (!user.password) {
+                console.error('User password is missing');
+                throw new Error('User password is missing');
+            }
+
+            const passwordMatch = await bcrypt.compare(password || '', user.password);
+
+            if (!passwordMatch) {
+                console.error('Incorrect password');
+                throw new Error('Incorrect password');
+            }
+
+            // Return user information or success indicator if needed
+            return { user }; // Modify this based on your needs
+        } catch (error) {
+            console.error('Error in checkCreds:', error);
+            throw new Error('Authentication failed');
+        }
+    }
+
+
+
 }
 const Roc = new PersonService()
 const Triage = new VitalsService()

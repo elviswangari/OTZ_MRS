@@ -1,5 +1,6 @@
 const { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir } = require('../utils/db');
 const { internalError } = require('../utils/errors');
+const { redisClient } = require('../utils/redis');
 const home = (req, res) => {
   res.status(200).json({
     message: "hcw homepage"
@@ -197,9 +198,11 @@ const getRocRecord = async (req, res) => {
   try {
     const { cccNumber } = req.body;
     const rocRecord = await Roc.findPersonByCCCNumber(cccNumber);
+    // const redisRec = await redisClient.getAuthToken(req.headers.authorization);
     if (rocRecord) {
       res.status(200).json({
         rocRecord,
+        // redisRec,
       });
     } else {
       res.status(404).json({

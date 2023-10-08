@@ -1,4 +1,3 @@
-const { User } = require('../model/DbModel');
 const { Users } = require('../utils/db');
 const { internalError } = require('../utils/errors');
 
@@ -12,16 +11,20 @@ const register = async (req, res) => {
             userId: newUser.userId,
         });
 
-        // Redirect to the "/roc" route upon successful registration
-        res.redirect('/roc');
     } catch (error) {
-        // Log the error for debugging purposes (don't expose sensitive details)
         console.error('Error during registration:', error);
 
-        // Provide a generic error message to the user
-        internalError('An error occurred during registration', res);
+        if (error.message === 'Person with these details does not exist. Please contact the HCW.') {
+            // Handle the case where the person is not found
+            res.status(400).json({
+                message: 'Invalid person details. Please contact the healthcare worker.',
+            });
+        } else {
+            // Handle other registration errors
+            internalError('An error occurred during registration', res);
+        }
     }
-};
+}
 
 
 const login = async (req, res) => {
@@ -45,5 +48,5 @@ const login = async (req, res) => {
 
 module.exports = {
     register,
-    login
+    login,
 };
