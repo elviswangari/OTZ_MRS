@@ -322,7 +322,7 @@ class AppointmentsService {
             // Remove the appointment from the person's array 
             const appointmentIndex = person.appointments.indexOf(appointmentId);
             if (appointmentIndex !== -1) {
-                person.vitals.splice(appointmentIndex, 1);
+                person.appointments.splice(appointmentIndex, 1);
                 await person.save();
             }
 
@@ -450,8 +450,8 @@ class UserService {
             const newUser = new this.User({ firstName, cccNumber, email, phoneNumber, password: hashedPassword });
             await newUser.save();
 
-            // Log the user's _id before generating the token
-            console.log('New User _id:', newUser._id);
+            // // Log the user's _id before generating the token
+            // console.log('New User _id:', newUser._id);
 
             // After successful registration, generate an authentication token
             const token = jwt.sign({ userId: newUser._id }, config.SECRET_KEY, { expiresIn: '1h' });
@@ -472,8 +472,8 @@ class UserService {
                 $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
             });
 
-            // Log the user's _id before generating or retrieving the token
-            console.log('User _id:', user ? user._id : null);
+            // // Log the user's _id before generating or retrieving the token
+            // console.log('User _id:', user ? user._id : null);
 
             if (!user) {
                 throw new Error('User not found');
@@ -514,29 +514,28 @@ class UserService {
 
             if (!user) {
                 console.error('User not found');
-                throw new Error('User not found');
+                return { success: false, message: 'User not found' };
             }
 
             if (!user.password) {
                 console.error('User password is missing');
-                throw new Error('User password is missing');
+                return { success: false, message: 'User password is missing' };
             }
 
             const passwordMatch = await bcrypt.compare(password || '', user.password);
 
             if (!passwordMatch) {
                 console.error('Incorrect password');
-                throw new Error('Incorrect password');
+                return { success: false, message: 'Incorrect password' };
             }
 
             // Return user information or success indicator if needed
-            return { user }; // Modify this based on your needs
+            return { success: true, user }; // Modify this based on your needs
         } catch (error) {
             console.error('Error in checkCreds:', error);
-            throw new Error('Authentication failed');
+            return { success: false, message: 'Authentication failed' };
         }
     }
-
 
 
 }

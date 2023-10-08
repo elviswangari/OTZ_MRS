@@ -44,7 +44,7 @@ const login = async (req, res) => {
         // Provide a generic error message to the user
         internalError('An error occurred during login', res);
     }
-};
+}
 
 module.exports = {
     register,
