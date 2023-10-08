@@ -361,8 +361,8 @@ class PharmacyService {
 
     async findPharmaciesForPerson(cccNumber) {
         try {
-            const person = await this.Person.findOne({ cccNumber }).populate('pharmacies');
-            return person ? person.pharmacies : [];
+            const person = await this.Person.findOne({ cccNumber }).populate('pharmacy');
+            return person ? person.pharmacy : [];
         } catch (error) {
             console.error(error);
             throw error;

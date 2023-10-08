@@ -60,13 +60,31 @@ const Jwt = async (req, res, next) => {
         const [authType, credentials] = authorization.split(' ');
 
         if (authType === BEARER_AUTH) {
+            // const { userId } = await validateBearerToken(credentials, res);
+            // req.user = { userId, };
             const { userId } = await validateBearerToken(credentials, res);
-            req.user = { userId };
+
+            // Fetch additional details from the database based on the user ID
+            const user = await Users.findById(userId);
+
+            if (!user) {
+                return res.status(401).json({
+                    message: 'User not found',
+                });
+            }
+
+            req.user = {
+                userId: user._id,
+                cccNumber: user.cccNumber,
+            };
             next();
         } else if (authType === BASIC_AUTH) {
             const basicAuthResult = await validateBasicAuth(credentials, res);
             if (basicAuthResult.success) {
-                req.user = { userId: basicAuthResult.user._id };
+                req.user = {
+                    userId: basicAuthResult.user._id,
+                    cccNumber: basicAuthResult.user.cccNumber,
+                };
                 next();
             } else {
                 return res.status(401).json({
