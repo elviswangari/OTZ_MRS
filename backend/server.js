@@ -2,10 +2,14 @@ import express from "express";
 import dotenv from 'dotenv';;
 import { rocRoutes } from './routes/rocRoutes.js';
 import { hcwRoutes } from './routes/hcwRoutes.js';
+import mongoose from 'mongoose';
 
 dotenv.config();
 
 const app = express();
+
+//connect to db
+mongoose.connect(process.env.DB_URL);
 
 // Middleware Connections
 // app.use(cors())

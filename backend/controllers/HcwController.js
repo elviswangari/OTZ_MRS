@@ -386,7 +386,7 @@ const deletePharmacyOrder = async (req, res) => {
 
 //appointments
 //appointments
-const newAppoitment = async (req, res) => {
+const newAppointment = async (req, res) => {
     try {
         // Extract ROC data from the request body
         const {
@@ -412,7 +412,7 @@ const newAppoitment = async (req, res) => {
 }
 
 // update appoinment
-const updateAppoitment = async (req, res) => {
+const updateAppointment = async (req, res) => {
     try {
         // Extract ROC data from the request body
         const {
@@ -445,7 +445,7 @@ const updateAppoitment = async (req, res) => {
 }
 
 //delete appointment order
-const deleteAppoitment = async (req, res) => {
+const deleteAppointment = async (req, res) => {
     const { cccNumber, appointmentId } = req.body;
     try {
         const deletedAppointment = await AppointmentDir.deleteAppointmentForPerson(cccNumber, appointmentId);
@@ -478,9 +478,7 @@ export {
     newPharmacyOrder,
     updatePharmacyOrder,
     deletePharmacyOrder,
-    newAppoitment,
-    updateAppoitment,
-    deleteAppoitment,
+    newAppointment,
+    updateAppointment,
+    deleteAppointment,
 };
-
-// export { home }
