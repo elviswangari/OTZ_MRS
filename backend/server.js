@@ -1,9 +1,17 @@
 import express from "express";
-import dotenv from 'dotenv';
+import dotenv from 'dotenv';;
+import { rocRoutes } from './routes/rocRoutes.js';
+import { hcwRoutes } from './routes/hcwRoutes.js';
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
+const app = express();
+
+// Middleware Connections
+// app.use(cors())
+app.use(express.json());
+// app.use(Jwt)
+
 
 // Routes
 app.get('/', (req, res) => {
@@ -12,8 +20,10 @@ app.get('/', (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3001;
+app.use('/roc', rocRoutes);
+app.use('/hcw', hcwRoutes);
 
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`App running on port: ${PORT}`);
 });

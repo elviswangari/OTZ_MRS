@@ -1,9 +1,10 @@
-import { Vitals, Lab, Appointments, Pharmacy, Person, User } from '../model/DbModel';
+import { Vitals, Lab, Appointments, Pharmacy, Person, User } from '../model/DBModel.js';
+import mongoose from 'mongoose';
 
-mongoose.connect(process.env.DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+// mongoose.connect(process.env.DB_URL, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// });
 
 class PersonService {
     constructor() {
@@ -549,7 +550,7 @@ const LabOrders = new LabService()
 const AppointmentDir = new AppointmentsService()
 const PharmacyDir = new PharmacyService()
 const Users = new UserService();
-module.exports = {
+export {
     Roc,
     Triage,
     LabOrders,

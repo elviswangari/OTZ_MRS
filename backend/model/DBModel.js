@@ -164,7 +164,7 @@ const Pharmacy = mongoose.model('Pharmacy', pharmacySchema);
 const Person = mongoose.model('Person', personSchema);
 const User = mongoose.model('User', userSchema);
 
-module.exports = {
+export {
     Vitals,
     Lab,
     Appointments,
