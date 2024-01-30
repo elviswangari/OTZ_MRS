@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from 'dotenv';;
 import { rocRoutes } from './routes/rocRoutes.js';
 import { hcwRoutes } from './routes/hcwRoutes.js';
+import { register, login } from './controllers/AuthController.js'
 import mongoose from 'mongoose';
 
 dotenv.config();
@@ -23,6 +24,9 @@ app.get('/', (req, res) => {
         message: "server homepage"
     });
 });
+
+app.post('/register', register);
+app.post('/login', login);
 
 app.use('/roc', rocRoutes);
 app.use('/hcw', hcwRoutes);

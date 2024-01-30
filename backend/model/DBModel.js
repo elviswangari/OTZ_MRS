@@ -99,6 +99,10 @@ const personSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    gender: {
+        type: String,
+        require: true,
+    },
     residence: {
         type: String,
         required: true,
@@ -113,6 +117,13 @@ const personSchema = new mongoose.Schema({
         unique: true,
         min: 1e9,
         max: 1e10 - 1,
+    },
+    OTZNumber: {
+        type: String,
+        required: true,
+        unique: true,
+        min: 1e5,
+        max: 1e6,
     },
     dateEnrolledIntoCare: {
         type: Date,
@@ -155,6 +166,15 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
 });
 
+const hcwSchema = new mongoose.Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phoneNumber: { type: String, required: true },
+    role: { type: String, required: true, },
+    password: { type: String, required: true },
+});
+
 
 // Export the models
 const Vitals = mongoose.model('Vital', vitalsSchema);
@@ -163,6 +183,7 @@ const Appointments = mongoose.model('Appointment', appointmentsSchema);
 const Pharmacy = mongoose.model('Pharmacy', pharmacySchema);
 const Person = mongoose.model('Person', personSchema);
 const User = mongoose.model('User', userSchema);
+const Hcw = mongoose.model('Hcw', hcwSchema);
 
 export {
     Vitals,
@@ -171,4 +192,5 @@ export {
     Pharmacy,
     Person,
     User,
+    Hcw,
 };

@@ -1,12 +1,8 @@
 import { Vitals, Lab, Appointments, Pharmacy, Person, User } from '../model/DBModel.js';
 import mongoose from 'mongoose';
-
-// mongoose.connect(process.env.DB_URL, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// });
-
-
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { setAuthToken, getAuthToken } from './redis.js';
 
 class PersonService {
     constructor() {
@@ -445,10 +441,10 @@ class UserService {
             // console.log('New User _id:', newUser._id);
 
             // After successful registration, generate an authentication token
-            const token = jwt.sign({ userId: newUser._id }, config.SECRET_KEY, { expiresIn: '1h' });
+            const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
             // Store the authentication token in the cache
-            redisClient.setAuthToken(token, newUser._id);
+            setAuthToken(token, newUser._id);
 
             return { message: 'User registered successfully', token, userId: newUser._id };
         } catch (error) {
@@ -463,8 +459,7 @@ class UserService {
                 $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
             });
 
-            // // Log the user's _id before generating or retrieving the token
-            // console.log('User _id:', user ? user._id : null);
+
 
             if (!user) {
                 throw new Error('User not found');
@@ -478,18 +473,20 @@ class UserService {
             }
 
             // Check if a valid token exists in the cache
-            const existingToken = await redisClient.getAuthToken(user._id);
+            const existingToken = await getAuthToken(user._id);
 
             if (existingToken) {
                 return { token: existingToken, userId: user._id };
             }
-            // After successful login, generate an authentication token
-            const token = jwt.sign({ userId: user._id }, config.SECRET_KEY, { expiresIn: '1h' });
+            else {
+                // After successful login, generate an authentication token
+                const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
-            // Store the authentication token in the cache
-            redisClient.setAuthToken(token, user._id);
+                // Store the authentication token in the cache
+                setAuthToken(token, user._id);
 
-            return { token, userId: user._id };
+                return { token, userId: user._id };
+            }
         } catch (error) {
             throw error;
         }
@@ -521,7 +518,7 @@ class UserService {
             }
 
             // Return user information or success indicator if needed
-            return { success: true, user }; // Modify this based on your needs
+            return { success: true, user };
         } catch (error) {
             console.error('Error in checkCreds:', error);
             return { success: false, message: 'Authentication failed' };
