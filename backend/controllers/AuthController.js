@@ -1,4 +1,4 @@
-import { Users } from '../utils/db.js';
+import { Users, Common } from '../utils/db.js';
 import { internalError } from '../utils/errors.js';
 
 const register = async (req, res) => {
@@ -30,7 +30,9 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { identifier, password } = req.body;
-        const authResult = await Users.login(identifier, password);
+
+        // console.log(identifier)
+        const authResult = await Common.login(identifier, password);
 
         res.status(200).json({
             message: 'Login successful',

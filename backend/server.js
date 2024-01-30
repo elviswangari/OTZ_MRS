@@ -1,9 +1,10 @@
 import express from "express";
-import dotenv from 'dotenv';;
+import dotenv from 'dotenv';
 import { rocRoutes } from './routes/rocRoutes.js';
 import { hcwRoutes } from './routes/hcwRoutes.js';
 import { register, login } from './controllers/AuthController.js'
 import mongoose from 'mongoose';
+import { authenticateToken } from './middleware/AuthMiddleware.js'
 
 dotenv.config();
 
@@ -28,8 +29,8 @@ app.get('/', (req, res) => {
 app.post('/register', register);
 app.post('/login', login);
 
-app.use('/roc', rocRoutes);
-app.use('/hcw', hcwRoutes);
+app.use('/roc', authenticateToken, rocRoutes);
+app.use('/hcw', authenticateToken, hcwRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

@@ -1,4 +1,4 @@
-import { Vitals, Lab, Appointments, Pharmacy, Person, User } from '../model/DBModel.js';
+import { Vitals, Lab, Appointments, Pharmacy, Person, User, Hcw } from '../model/DBModel.js';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -412,6 +412,7 @@ class UserService {
     constructor() {
         this.Person = mongoose.model('Person', Person.schema);
         this.User = mongoose.model('User', User.schema);
+        // this.Hcw = mongoose.model('Hcw', Hcw.schema);
     }
     async registerUser(registrationDetails) {
         try {
@@ -452,47 +453,6 @@ class UserService {
         }
     }
 
-    async login(identifier, password) {
-        try {
-            // Check if a user with the given identifier exists
-            const user = await this.User.findOne({
-                $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
-            });
-
-
-
-            if (!user) {
-                throw new Error('User not found');
-            }
-
-            // Check if the provided password matches the stored hashed password
-            const passwordMatch = await bcrypt.compare(password, user.password || '');
-
-            if (!passwordMatch) {
-                throw new Error('Incorrect password');
-            }
-
-            // Check if a valid token exists in the cache
-            const existingToken = await getAuthToken(user._id);
-
-            if (existingToken) {
-                return { token: existingToken, userId: user._id };
-            }
-            else {
-                // After successful login, generate an authentication token
-                const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-
-                // Store the authentication token in the cache
-                setAuthToken(token, user._id);
-
-                return { token, userId: user._id };
-            }
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
 
     async checkCreds(identifier, password) {
         try {
@@ -528,7 +488,7 @@ class UserService {
     async findUserById(userId) {
         try {
             const user = await this.User.findById(userId);
-            console.log(`db.js , ${user}`)
+            // console.log(`db.js , ${user}`)
 
             if (!user) {
                 console.error('User not found');
@@ -543,12 +503,110 @@ class UserService {
     }
 
 }
+class HcwService {
+    constructor() {
+        this.Hcw = mongoose.model('Hcw', Hcw.schema);
+    }
+    async registerHcw(registrationDetails) {
+        try {
+            const { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword } = registrationDetails;
+
+            // Check if a hcw exist
+            const existingPerson = await this.Hcw.findOne({ username, email, phoneNumber, firstName });
+
+            if (existingPerson) {
+                return { message: 'Account already exists. Please log in.' };
+            }
+            if (password !== confirmPassword) {
+                return { message: 'Password and Confirm Password do not match' };
+            }
+
+            // Proceed with registration
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = new this.Hcw({ firstName, lastName, username, gender, email, phoneNumber, roles, password: hashedPassword });
+
+            // console.log(newUser)
+            await newUser.save();
+
+
+            // After successful registration, generate an authentication token
+            const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+            // console.log(token)
+            // Store the authentication token in the cache
+            setAuthToken(token, newUser._id);
+
+            return { message: 'HCW registered successfully', token, userId: newUser._id };
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+}
+class CommonService {
+    constructor() {
+        this.User = mongoose.model('User', User.schema);
+        this.Hcw = mongoose.model('Hcw', Hcw.schema);
+    }
+
+    async login(identifier, password) {
+        try {
+            // Check if a user with the given identifier exists
+            const user = await this.User.findOne({
+                $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
+            });
+
+            // Check if a HCW with the given identifier exists
+            const hcw = await this.Hcw.findOne({
+                $or: [{ email: identifier }, { phoneNumber: identifier }, { username: identifier }],
+            });
+
+            if (!user && !hcw) {
+                throw new Error('User not found');
+            }
+
+            // Check if the provided password matches the stored hashed password
+            const userPasswordMatch = user ? await bcrypt.compare(password, user.password || '') : false;
+            const hcwPasswordMatch = hcw ? await bcrypt.compare(password, hcw.password || '') : false;
+
+            if (!userPasswordMatch && !hcwPasswordMatch) {
+                throw new Error('Incorrect password');
+            }
+
+            // Use the appropriate model to get user ID
+            const userId = user ? user._id : hcw._id;
+
+            // Check if a valid token exists in the cache
+            const existingToken = await getAuthToken(userId);
+
+            if (existingToken) {
+                return { token: existingToken, userId };
+            } else {
+                // After successful login, generate an authentication token
+                const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
+
+                // Store the authentication token in the cache
+                setAuthToken(token, userId);
+
+                return { token, userId };
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+
 const Roc = new PersonService()
 const Triage = new VitalsService()
 const LabOrders = new LabService()
 const AppointmentDir = new AppointmentsService()
 const PharmacyDir = new PharmacyService()
 const Users = new UserService();
+const Hcws = new HcwService();
+const Common = new CommonService();
 export {
     Roc,
     Triage,
@@ -556,4 +614,6 @@ export {
     AppointmentDir,
     PharmacyDir,
     Users,
+    Hcws,
+    Common,
 };

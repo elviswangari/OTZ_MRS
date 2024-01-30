@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { getStats, getStatus, } from '../controllers/AppController.js';
 // import { home, getNoOfUser, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment } from '../controllers/HcwController.js';
-import { home, getNoOfUser, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment } from '../controllers/HcwController.js';
+import { home, getNoOfUser, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment, newHcwAccount } from '../controllers/HcwController.js';
 
 const hcwRoutes = Router();
 
@@ -29,5 +29,7 @@ hcwRoutes.post('/pharmacy', newPharmacyOrder)
 hcwRoutes.post('/appointments', newAppointment)
   .put('/appointments', updateAppointment)
   .delete('/appointments', deleteAppointment);
+
+hcwRoutes.post('/accounts', newHcwAccount)
 
 export { hcwRoutes };

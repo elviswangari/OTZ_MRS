@@ -1,19 +1,17 @@
-import { Roc, Triage, LabOrders, AppointmentDir, PharmacyDir } from '../utils/db.js';
+import { Roc, Triage, LabOrders, AppointmentDir, PharmacyDir, Users } from '../utils/db.js';
 import { internalError } from '../utils/errors.js'
 
-const getTest = async (req, res) => {
-    try {
-        console.log('req.user:', req.user);
-    } catch (error) {
-        console.error('Error in home:', error);
-        internalError(error, res);
-    }
-}
 const home = async (req, res) => {
     try {
         // Get CCC number from the authenticated user's details
-        const cccNumber = req.user.cccNumber;
+        // console.log(req.user.userId)
+        const userId = req.user.userId
 
+        const personId = await Users.findUserById(userId);
+        // console.log(personId)
+        const cccNumber = personId.cccNumber;
+
+        // console.log(cccNumber);
         // Fetch details from the Persons collection based on CCC number
         const personDetails = await Roc.findPersonByCCCNumber(cccNumber);
 
@@ -30,7 +28,9 @@ const home = async (req, res) => {
 const getVitals = async (req, res) => {
     try {
         // Get CCC number from the authenticated user's details
-        const cccNumber = req.user.cccNumber;
+        const userId = req.user.userId;
+        const personId = await Users.findUserById(userId);
+        const cccNumber = personId.cccNumber;
         // Fetch details from the Persons collection based on CCC number
         const personVitals = await Triage.findVitalsForPerson(cccNumber);
 
@@ -48,7 +48,9 @@ const getVitals = async (req, res) => {
 const getLabs = async (req, res) => {
     try {
         // Get CCC number from the authenticated user's details
-        const cccNumber = req.user.cccNumber;
+        const userId = req.user.userId;
+        const personId = await Users.findUserById(userId);
+        const cccNumber = personId.cccNumber;
         // Fetch details from the Persons collection based on CCC number
         const personLabs = await LabOrders.findLabsForPerson(cccNumber);
 
@@ -67,7 +69,9 @@ const getLabs = async (req, res) => {
 const getAppointments = async (req, res) => {
     try {
         // Get CCC number from the authenticated user's details
-        const cccNumber = req.user.cccNumber;
+        const userId = req.user.userId;
+        const personId = await Users.findUserById(userId);
+        const cccNumber = personId.cccNumber;
         // Fetch details from the Persons collection based on CCC number
         const personAppointments = await AppointmentDir.findAppointmentsForPerson(cccNumber);
 
@@ -85,7 +89,9 @@ const getAppointments = async (req, res) => {
 const getPharmacy = async (req, res) => {
     try {
         // Get CCC number from the authenticated user's details
-        const cccNumber = req.user.cccNumber;
+        const userId = req.user.userId;
+        const personId = await Users.findUserById(userId);
+        const cccNumber = personId.cccNumber;
         // Fetch details from the Persons collection based on CCC number
         const personPharmacy = await PharmacyDir.findPharmaciesForPerson(cccNumber);
 
@@ -107,5 +113,4 @@ export {
     getLabs,
     getAppointments,
     getPharmacy,
-    getTest,
 };

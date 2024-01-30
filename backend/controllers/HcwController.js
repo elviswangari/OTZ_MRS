@@ -1,4 +1,4 @@
-import { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir } from '../utils/db.js';
+import { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir, Hcws } from '../utils/db.js';
 import { internalError } from '../utils/errors.js';
 // import { redisClient } from '../utils/redis.js';
 
@@ -471,6 +471,22 @@ const deleteAppointment = async (req, res) => {
     }
 }
 
+const newHcwAccount = async (req, res) => {
+    const { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword } = req.body;
+    try {
+        const hcwDetails = { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword };
+        const newAccount = await Hcws.registerHcw(hcwDetails);
+        console.log(newAccount)
+        res.status(200).json({
+            message: newAccount.message,
+            token: newAccount.token,
+            userId: newAccount.userId,
+        });
+
+    } catch (error) {
+        internalError(error, res);
+    }
+}
 export {
     home,
     getNoOfUser,
@@ -489,4 +505,5 @@ export {
     newAppointment,
     updateAppointment,
     deleteAppointment,
+    newHcwAccount,
 };
