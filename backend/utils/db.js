@@ -1,4 +1,4 @@
-import { Vitals, Lab, Appointments, Pharmacy, Person, User, Hcw } from '../model/DBModel.js';
+import { Vitals, Lab, Appointments, Pharmacy, Person, User, Hcw, Module } from '../model/DBModel.js';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -63,6 +63,13 @@ class PersonService {
     async deletePersonByCCCNumber(cccNumber) {
         try {
             return await Person.findOneAndDelete({ cccNumber });
+        } catch (error) {
+            throw error;
+        }
+    }
+    async findAllPersons() {
+        try {
+            return await Person.find({});
         } catch (error) {
             throw error;
         }
@@ -149,6 +156,7 @@ class VitalsService {
             throw error;
         }
     }
+
 }
 
 class LabService {
@@ -229,6 +237,13 @@ class LabService {
             }
 
             return true;
+        } catch (error) {
+            throw error;
+        }
+    }
+    async findAllLabs() {
+        try {
+            return await Lab.find({});
         } catch (error) {
             throw error;
         }
@@ -518,7 +533,7 @@ class HcwService {
                 return { message: 'Account already exists. Please log in.' };
             }
             if (password !== confirmPassword) {
-                return { message: 'Password and Confirm Password do not match' };
+                return { message: 'Password do not match' };
             }
 
             // Proceed with registration
@@ -537,6 +552,32 @@ class HcwService {
             setAuthToken(token, newUser._id);
 
             return { message: 'HCW registered successfully', token, userId: newUser._id };
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateHcw(hcwId, updatedDetails) {
+
+        const { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword } = updatedDetails;
+        try {
+            // const hcw = await this.Hcw.findById(hcwId);
+            if (password !== confirmPassword) {
+                return { message: 'Password do not match' };
+            }
+            if (password !== confirmPassword) {
+                return { message: 'Password do not match' };
+            }
+
+            // Proceed with update
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const updatedDetails = { firstName, lastName, username, gender, email, phoneNumber, roles, password: hashedPassword };
+
+            const updatedHcw = await this.Hcw.findOneAndUpdate(
+                { _id: hcwId }, updatedDetails, { new: true }
+            );
+            return { message: 'HCW Updated successfully', userId: updatedHcw._id };;
 
         } catch (error) {
             throw error;
@@ -599,6 +640,73 @@ class CommonService {
 }
 
 
+class ModuleService {
+    constructor() {
+        this.Module = mongoose.model('module', Module.schema);
+    }
+
+    async createModule(moduleData) {
+        try {
+            const newModule = new this.Module(moduleData);
+            const savedModule = await newModule.save();
+            return savedModule;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async findAllModules() {
+        try {
+            const modules = await this.Module.find();
+            return modules;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async findModuleById(moduleId) {
+        try {
+            const module = await this.Module.findById(moduleId);
+            if (!module) {
+                throw new Error('Module not found');
+            }
+            return module;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async updateModule(moduleId, updatedData) {
+        try {
+            const updatedModule = await this.Module.findByIdAndUpdate(moduleId, updatedData, { new: true });
+            if (!updatedModule) {
+                throw new Error('Module not found');
+            }
+            return updatedModule;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
+    async deleteModule(moduleId) {
+        try {
+            const deletedModule = await this.Module.findByIdAndDelete(moduleId);
+            if (!deletedModule) {
+                throw new Error('Module not found');
+            }
+            return true;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+}
+
+
 const Roc = new PersonService()
 const Triage = new VitalsService()
 const LabOrders = new LabService()
@@ -607,6 +715,7 @@ const PharmacyDir = new PharmacyService()
 const Users = new UserService();
 const Hcws = new HcwService();
 const Common = new CommonService();
+const Modules = new ModuleService()
 export {
     Roc,
     Triage,
@@ -616,4 +725,5 @@ export {
     Users,
     Hcws,
     Common,
+    Modules,
 };

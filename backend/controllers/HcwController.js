@@ -1,12 +1,27 @@
-import { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir, Hcws } from '../utils/db.js';
+import { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir, Hcws, Modules } from '../utils/db.js';
 import { internalError } from '../utils/errors.js';
 // import { redisClient } from '../utils/redis.js';
 
-const home = (req, res) => {
-    res.status(200).json({
-        message: "hcw homepage"
-    });
-}
+const home = async (req, res) => {
+    try {
+        const people = await Roc.findAllPersons();
+        const allCCCNumbers = people.map(person => ({
+            cccNumber: person.cccNumber,
+            gender: person.gender,
+            dob: person.dateOfBirth,
+            labs: person.labs
+        }));
+        const labs = await LabOrders.findAllLabs()
+
+        res.status(200).json({
+            message: "hcw homepage",
+            allCCCNumbers,
+            labs
+        });
+    } catch (error) {
+        internalError(error, res);
+    }
+};
 const getNoOfUser = async (req, res) => {
     const users = await Roc.nbusers();
     res.status(200).json({ users })
@@ -476,7 +491,7 @@ const newHcwAccount = async (req, res) => {
     try {
         const hcwDetails = { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword };
         const newAccount = await Hcws.registerHcw(hcwDetails);
-        console.log(newAccount)
+        // console.log(newAccount)
         res.status(200).json({
             message: newAccount.message,
             token: newAccount.token,
@@ -487,6 +502,77 @@ const newHcwAccount = async (req, res) => {
         internalError(error, res);
     }
 }
+
+const updateHcwAccount = async (req, res) => {
+    const { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword, hcwId } = req.body;
+    try {
+        const hcwDetails = { firstName, lastName, username, gender, email, phoneNumber, roles, password, confirmPassword };
+        const updateAccount = await Hcws.updateHcw(hcwId, hcwDetails);
+        // console.log(updateAccount)
+        res.status(200).json({
+            message: updateAccount.message,
+            userId: updateAccount.userId,
+        });
+
+    } catch (error) {
+        internalError(error, res);
+    }
+}
+
+const newModule = async (req, res) => {
+    const { title, category, body } = req.body;
+
+    try {
+        const newModule = { title, category, body };
+        const mod = await Modules.createModule(newModule);
+
+        console.log(mod);
+
+        res.status(200).json({
+            title: mod.title,
+            userId: mod._id,
+        });
+    } catch (error) {
+        internalError(error, res)
+    }
+}
+const updateModule = async (req, res) => {
+    const { title, category, body, moduleId } = req.body;
+
+    try {
+        const newModule = { title, category, body };
+        const mod = await Modules.updateModule(moduleId, newModule);
+
+
+        res.status(200).json({
+            title: mod.title,
+            userId: mod._id,
+        });
+    } catch (error) {
+        internalError(error, res)
+    }
+}
+
+const deleteModule = async (req, res) => {
+    const {moduleId} = req.body;
+
+    try {
+        const mod = await Modules.deleteModule(moduleId);
+
+        if (mod) {
+            res.status(204).json({
+                message: 'Module record deleted successfully',
+            });
+        } else {
+            res.status(404).json({
+                message: 'Module record not found',
+            });
+        }
+    } catch (error) {
+        internalError(error, res)
+    }
+}
+
 export {
     home,
     getNoOfUser,
@@ -506,4 +592,9 @@ export {
     updateAppointment,
     deleteAppointment,
     newHcwAccount,
+    updateHcwAccount,
+    newModule,
+    updateModule,
+    deleteModule,
+
 };

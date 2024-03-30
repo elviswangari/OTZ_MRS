@@ -178,6 +178,12 @@ const hcwSchema = new mongoose.Schema({
 
 });
 
+const modules = new mongoose.Schema({
+    title: { type: String, required: true },
+    category: { type: String, required: true },
+    // image: { data: Buffer, contentType: String },
+    body: { type: String, required: true },
+}, { timestamps: true });
 
 // Export the models
 const Vitals = mongoose.model('Vital', vitalsSchema);
@@ -187,6 +193,7 @@ const Pharmacy = mongoose.model('Pharmacy', pharmacySchema);
 const Person = mongoose.model('Person', personSchema);
 const User = mongoose.model('User', userSchema);
 const Hcw = mongoose.model('Hcw', hcwSchema);
+const Module = mongoose.model('module', modules)
 
 export {
     Vitals,
@@ -196,4 +203,5 @@ export {
     Person,
     User,
     Hcw,
+    Module,
 };
