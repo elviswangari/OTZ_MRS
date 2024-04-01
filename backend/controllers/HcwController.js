@@ -1,6 +1,7 @@
 import { Roc, Triage, LabOrders, PharmacyDir, AppointmentDir, Hcws, Modules } from '../utils/db.js';
 import { internalError } from '../utils/errors.js';
 // import { redisClient } from '../utils/redis.js';
+import Excel from 'exceljs';
 
 const home = async (req, res) => {
     try {
@@ -554,7 +555,7 @@ const updateModule = async (req, res) => {
 }
 
 const deleteModule = async (req, res) => {
-    const {moduleId} = req.body;
+    const { moduleId } = req.body;
 
     try {
         const mod = await Modules.deleteModule(moduleId);
@@ -572,6 +573,169 @@ const deleteModule = async (req, res) => {
         internalError(error, res)
     }
 }
+
+const allReports = async (req, res) => {
+    try {
+        res.status(200).json({
+            message: "Report dashboard"
+        });
+    } catch (error) {
+        internalError(error, res)
+    }
+}
+
+const otzMonthly = async (req, res) => {
+    try {
+        let workbook = new Excel.Workbook();
+
+        // Create a single worksheet for all tables
+        let worksheet = workbook.addWorksheet('OTZ Monthly Report');
+
+        // Define header information
+        const headerInfo = [
+            ['OTZ MONTHLY REPORTING TOOL'],
+            ['Facility: ______NTRH______'],
+            ['MONTH: JAN YEAR: 2024']
+        ];
+
+        // Merge cells and center-align text for header information
+        headerInfo.forEach(info => {
+            const row = worksheet.addRow(info);
+            row.getCell(1).alignment = { horizontal: 'center' };
+            worksheet.mergeCells(row.number, 1, row.number, 3);
+        });
+
+        // Add an empty row after the header information
+        worksheet.addRow([]);
+
+        // Define columns for each table
+        const tableData = [
+            {
+                title: '',
+                headers: ['Baseline Information', 'Male 10-19yrs', 'Female 10-19yrs'],
+                rows: [
+                    ['Adolescent currently on ART', '59', '70'],
+                    ['Adolescent Active in OTZ', '59', '69'],
+                    ['Newly enrolled in OTZ within the month', '2', '2'],
+                    ['ALHIV in OTZ with baseline VL results (VL within the last 12 months)', '1', '2'],
+                    ['ALHIV\'s enrolled in OTZ with VL> 1000 at baseline', '0', '0'],
+                    ['ALHIV\'s enrolled in OTZ with VL< 1000 at baseline', '1', '0'],
+                    ['ALHIV\'s enrolled in OTZ with VL = LDL at baseline', '0', '2']
+                ]
+            },
+            {
+                title: '',
+                headers: ['Routine VL monitoring', 'Male 10-19yrs', 'Female 10-19yrs'],
+                rows: [
+                    ['Total ALHIV who were eligible for routine viral load testing during the reporting', '3', '18'],
+                    ['Total ALHIV who were eligible for routine viral load testing from previous months', '20', '23'],
+                    ['# of ALHIV whose samples were taken for routine viral load testing', '0', '3'],
+                    ['# of ALHIV with routine follow up VL results at the end of the reporting month', '0', '0'],
+                    ['# with follow up VL > 1000 copies/ml', '0', '0'],
+                    ['#with routine follow up VL < 1000 copies/ml', '0', '0'],
+                    ['# with routine VL results reported as LDL', '0', '0']
+                ]
+            },
+            {
+                title: '',
+                headers: ['Additional monitoring', 'Male 10-19yrs', 'Female 10-19yrs'],
+                rows: [
+                    ['# of adolescents in OTZ who were booked for appointments in the month', '3', '18'],
+                    ['#  of adolescents in OTZ who kept their clinic appointments', '20', '23'],
+                    ['# of adolescents in OTZ with adherence >95% adherence', '0', '3'],
+                    ['# No of OTZ who attended support group and received motivational messages', '0', '0'],
+                ]
+            },
+            {
+                title: '',
+                headers: ['Tracking those with suspected treatment failure (6 month cohort report: Refer to guidance for month to review)', 'Male 10-19yrs', 'Female 10-19yrs'],
+                rows: [
+                    ['Total number of ALHIV with VL>1000 copies/ml from the 6 months earlier', '3', '18'],
+                    ['Total ALHIV for the month of review who had repeat VL test results', '20', '23'],
+                    ['# with repeat VL < 1000 copies/ml ', '0', '3'],
+                    ['# with repeat VL > 1000 copies/ml ', '0', '0'],
+                    ['# with follow up VL > 1000 copies/ml', '0', '0'],
+                    ['# switched to second line ART', '0', '0'],
+                    ['# switched to third line ART ', '0', '0']
+                ]
+            },
+            {
+                title: '',
+                headers: ['Tracking attritions', 'Male 10-19yrs', 'Female 10-19yrs'],
+                rows: [
+                    ['Number transferred out this month', '3', '18'],
+                    ['Number Lost to follow up this month', '20', '23'],
+                    ['No. transitioned to young adults (Age 20+) this month', '0', '3'],
+                    ['No. reported as dead this month', '0', '0'],
+                ]
+            },
+            {
+                title: '',
+                headers: ['Continuing Services', 'Male 20-24yrs', 'Female 20-24yrs'],
+                rows: [
+                    ['Number of adolescents graduating from OTZ and still in the program', '3', '18'],
+                    ['Total number eligible for routine VL testing this month', '20', '23'],
+                    ['Number whose samples were collected ', '0', '3'],
+                    ['Number with VL results', '0', '0'],
+                    ['Number with VL results <1000 copies/ml', '0', '0'],
+                    ['Number with VL results >1000 copies/ml', '0', '0'],
+                    ['Number exited from Post OTZ group this month', '0', '0']
+                ]
+            },
+        ];
+
+        // Add each table to the worksheet
+        tableData.forEach(table => {
+            // Add title row and merge cells
+            const titleRow = worksheet.addRow([table.title]);
+            titleRow.getCell(1).alignment = { horizontal: 'center' };
+            worksheet.mergeCells(titleRow.number, 1, titleRow.number, 3);
+
+            // Add headers row
+            const headerRow = worksheet.addRow(table.headers);
+            headerRow.font = { bold: true }; // Make header row bold
+            headerRow.eachCell((cell, index) => {
+                cell.alignment = { horizontal: index === 1 ? 'left' : 'center' };
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                }; // Add border to cells
+            });
+
+            // Add rows
+            table.rows.forEach(rowData => {
+                const row = worksheet.addRow(rowData);
+                row.eachCell((cell, index) => {
+                    cell.alignment = { horizontal: index === 1 ? 'left' : 'center', vertical: 'middle' };
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' }
+                    }; // Add border to cells
+                });
+            });
+
+            // Add empty row after each table
+            // worksheet.addRow([]);
+        });
+
+        // Set the headers to prompt download with the dynamic filename including date and time
+        const dateTime = new Date().toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0];
+        const filename = `otzMonthlyReport_${dateTime}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        internalError(error, res);
+    }
+};
+
+
 
 export {
     home,
@@ -596,5 +760,7 @@ export {
     newModule,
     updateModule,
     deleteModule,
+    allReports,
+    otzMonthly
 
 };

@@ -30,7 +30,8 @@ app.post('/register', register);
 app.post('/login', login);
 
 app.use('/roc', authenticateToken, rocRoutes);
-app.use('/hcw', authenticateToken, hcwRoutes);
+// app.use('/hcw', authenticateToken, hcwRoutes);
+app.use('/hcw', hcwRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
