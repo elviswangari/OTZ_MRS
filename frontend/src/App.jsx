@@ -1,10 +1,9 @@
-import Header from "./components/Header"
+import RocDashboard from "./components/RocDashboard";
 
 function App() {
   return (
     <div className="App">
-      <Header />
-      
+      <RocDashboard />
     </div>
   );
 }
