@@ -53,6 +53,7 @@ cd ..
 ```bash
 cd frontend
 npm install
+npm run dev
 ```
 
 7. Start the frontend development server:
