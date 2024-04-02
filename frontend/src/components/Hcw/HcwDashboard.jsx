@@ -8,7 +8,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
-export function RocDashboard() {
+export default function HcwDashboard() {
   return (
     <div
       key="1"

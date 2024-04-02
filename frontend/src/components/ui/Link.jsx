@@ -12,4 +12,4 @@ function Link({ to, children, className }) {
   );
 }
 
-export default Link;
+export {Link};

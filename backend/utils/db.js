@@ -617,13 +617,21 @@ class CommonService {
             }
 
             // Use the appropriate model to get user ID
-            const userId = user ? user._id : hcw._id;
+            // Use the appropriate model to get user ID and role
+            let userId, role;
+            if (user) {
+                userId = user._id;
+                role = 'roc';
+            } else if (hcw) {
+                userId = hcw._id;
+                role = 'hcw';
+            }
 
             // Check if a valid token exists in the cache
             const existingToken = await getAuthToken(userId);
 
             if (existingToken) {
-                return { token: existingToken, userId };
+                return { token: existingToken, role };
             } else {
                 // After successful login, generate an authentication token
                 const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
@@ -631,7 +639,7 @@ class CommonService {
                 // Store the authentication token in the cache
                 setAuthToken(token, userId);
 
-                return { token, userId };
+                return { token, userId, role };
             }
         } catch (error) {
             throw error;

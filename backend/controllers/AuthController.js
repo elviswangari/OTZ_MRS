@@ -38,6 +38,7 @@ const login = async (req, res) => {
             message: 'Login successful',
             token: authResult.token,
             userId: authResult.userId,
+            role: authResult.role,
         });
     } catch (error) {
         // Log the error for debugging purposes (don't expose sensitive details)
