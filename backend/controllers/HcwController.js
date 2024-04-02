@@ -577,7 +577,8 @@ const deleteModule = async (req, res) => {
 const allReports = async (req, res) => {
     try {
         res.status(200).json({
-            message: "Report dashboard"
+            otzMonthly: "<a href='http://localhost:3001/hcw/report/otzMonthly'>otzMounthly Report</a>",
+            stf: "<a href='http://localhost:3001/hcw/report/stf'>STF Report</a>",
         });
     } catch (error) {
         internalError(error, res)
@@ -723,7 +724,7 @@ const otzMonthly = async (req, res) => {
         });
 
         // Set the headers to prompt download with the dynamic filename including date and time
-        const dateTime = new Date().toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0];
+        const dateTime = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0];
         const filename = `otzMonthlyReport_${dateTime}.xlsx`;
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
@@ -735,7 +736,137 @@ const otzMonthly = async (req, res) => {
     }
 };
 
+const stf = async (req, res) => {
+    try {
+        let workbook = new Excel.Workbook();
 
+        // Create a single worksheet for all tables
+        let worksheet = workbook.addWorksheet('STF');
+
+        // Define header information
+        const headerInfo = [
+            ['STF REPORT'],
+            ['FACILITY: NTRH'],
+
+        ];
+
+        // Merge cells and center-align text for header information
+        headerInfo.forEach(info => {
+            const row = worksheet.addRow(info);
+            row.getCell(1).alignment = { horizontal: 'center' };
+            worksheet.mergeCells(row.number, 1, row.number, 3);
+        });
+
+        // Add an empty row after the header information
+        worksheet.addRow([]);
+        // Define columns for each table
+        const tableData = [
+            {
+                title: '',
+                headers: ['STF', 'Male 10-19yrs', 'Female 10-19yrs'],
+                rows: [
+                    ['Viral Load Copies > 200', '2', '1'],
+                    ['Viral Load Copies > 400', '1', '1'],
+                    ['Viral Load Copies > 1000', '2', '2'],
+                    ['Number EAC done', '1', '2'],
+                    ['Number of Home visit done', '0', '0'],
+                ]
+            },
+        ];
+
+        // Add each table to the worksheet
+        tableData.forEach(table => {
+            // Add title row and merge cells
+            const titleRow = worksheet.addRow([table.title]);
+            titleRow.getCell(1).alignment = { horizontal: 'center' };
+            worksheet.mergeCells(titleRow.number, 1, titleRow.number, 3);
+
+            // Add headers row
+            const headerRow = worksheet.addRow(table.headers);
+            headerRow.font = { bold: true }; // Make header row bold
+            headerRow.eachCell((cell, index) => {
+                cell.alignment = { horizontal: index === 1 ? 'left' : 'center' };
+                cell.border = {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                };
+            });
+
+            // Add rows
+            table.rows.forEach(rowData => {
+                const row = worksheet.addRow(rowData);
+                row.eachCell((cell, index) => {
+                    cell.alignment = { horizontal: index === 1 ? 'left' : 'center', vertical: 'middle' };
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' }
+                    };
+                });
+            });
+
+            // Add empty row after each table
+            // worksheet.addRow([]);
+        });
+
+        // Set the headers to prompt download with the dynamic filename including date and time
+        const dateTime = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0];
+        const filename = `STFReport_${dateTime}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (error) {
+        internalError(error, res);
+    }
+}
+
+const viralLoad = async (req, res) => {
+    try {
+        let workbook = new Excel.Workbook();
+
+        // Create a single worksheet for all tables
+        let worksheet = workbook.addWorksheet('STF');
+
+        worksheet.columns = [
+            { header: 'CCC Number', key: 'cccnumber', width: 15 },
+            { header: 'Age', key: 'age', width: 15 },
+            { header: 'Date Enrolled', key: 'enrolmentdate', width: 15 },
+            { header: 'ART Start Date', key: 'datestartedart', width: 15 },
+            { header: 'Viral Load results', key: 'vlresults', width: 17 },
+            { header: 'Viral Load Date', key: 'vldate', width: 15 },
+            { header: 'Current regimen', key: 'currentregimen', width: 15 },
+            { header: 'Date started Current regimen', key: 'datestartcurrentregimen', width: 20 }, // New header
+        ];
+
+        worksheet.addRow({
+            cccnumber: 1530500001,
+            age: 23,
+            enrolmentdate: new Date('2023-01-15'),
+            datestartedart: new Date('2023-02-10'),
+            vlresults: 'LDL',
+            vldate: new Date('2023-03-20'),
+            currentregimen: 'TDF/3TC/DTG',
+            datestartcurrentregimen: new Date('2023-02-20') // New date
+        });
+
+        // Set the headers to prompt download with the dynamic filename including date and time
+        const dateTime = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().replace(/:/g, '-').replace('T', '_').split('.')[0];
+        const filename = `viralLoad_${dateTime}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (error) {
+        internalError(error, res);
+    }
+};
 
 export {
     home,
@@ -761,6 +892,9 @@ export {
     updateModule,
     deleteModule,
     allReports,
-    otzMonthly
+    otzMonthly,
+    stf,
+    viralLoad,
+
 
 };

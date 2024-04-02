@@ -1,7 +1,7 @@
 /* eslint-disable jest/require-hook */
 import { Router } from 'express';
 import { getStats, getStatus, } from '../controllers/AppController.js';
-import { home, getNoOfUser, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment, newHcwAccount, updateHcwAccount, newModule, updateModule, deleteModule, allReports, otzMonthly } from '../controllers/HcwController.js';
+import { home, getNoOfUser, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment, newHcwAccount, updateHcwAccount, newModule, updateModule, deleteModule, allReports, otzMonthly, stf, viralLoad } from '../controllers/HcwController.js';
 
 const hcwRoutes = Router();
 
@@ -38,5 +38,7 @@ hcwRoutes.post('/accounts', newHcwAccount)
 
 hcwRoutes.get('/report', allReports);
 hcwRoutes.get('/report/otzMonthly', otzMonthly);
+hcwRoutes.get('/report/stf', stf);
+hcwRoutes.get('/report/viralLoad', viralLoad);
 
 export { hcwRoutes };
