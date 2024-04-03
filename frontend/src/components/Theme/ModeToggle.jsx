@@ -12,7 +12,8 @@ export function ModeToggle() {
   const { setTheme } = useTheme();
 
   return (
-          <DropdownMenu>
+    <div className="absolute top-12 lg:top-14 right-0 mt-3 mr-3">
+          <DropdownMenu >
         <DropdownMenuTrigger asChild>
           <Button>
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -32,5 +33,6 @@ export function ModeToggle() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      </div>
   );
 }
