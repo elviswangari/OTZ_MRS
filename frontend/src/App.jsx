@@ -1,57 +1,34 @@
-import { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import RocDashboard from "./components/Roc/RocDashboard";
-import HcwDashboard from "./components/Hcw/HcwDashboard";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
+import './App.css';
+import { Routes, Route, Navigate, BrowserRouter as Router } from 'react-router-dom';
+import { LoginForm } from '@/components/LoginForm';
+import { SignupForm } from '@/components/SignupForm';
+import { RocDashboard } from '@/components/Roc/RocDashboard';
+import { ThemeProvider } from '@/components/Theme/ThemeProvider';
+import { ModeToggle } from '@/components/Theme/ModeToggle';
+import { Triage } from '@/components/Roc/Triage';
+import { Appointments } from '@/components/Roc/Appointments';
+import { Labs } from '@/components/Roc/Labs';
+import { Modules } from '@/components/Roc/Modules';
+import { Pharmacy } from '@/components/Roc/Pharmacy';
 
 function App() {
-  const [token, setToken] = useState(null);
-
-  // Retrieve JWT token from local storage on component mount
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-  }, []);
-
-  // Define a function to check if the user is authenticated
-  const isAuthenticated = () => {
-    // Implement your authentication logic here
-    return token !== null;
-  };
-
   return (
-    <Router>
-      <Routes>
-        <Route exact path="/login" element={<Login setToken={setToken} />} />
-        <Route exact path="/signup" element={<Signup />} />
-        <Route
-          exact
-          path="/roc"
-          element={
-            isAuthenticated() ? <RocDashboard /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          exact
-          path="/hcw"
-          element={
-            isAuthenticated() ? <HcwDashboard /> : <Navigate to="/login" />
-          }
-        />
-        <Route
-          path="/"
-          element={
-            isAuthenticated() ? <Navigate to="/" /> : <Navigate to="/login" />
-          }
-        />
-      </Routes>
-    </Router>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <Router>
+        <ModeToggle />
+        <Routes>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignupForm />} />
+          <Route path="/" element={<RocDashboard />} />
+          <Route path="/triage" element={<Triage />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/labs" element={<Labs />} />
+          <Route path="/modules" element={<Modules />} />
+          <Route path="/pharmacy" element={<Pharmacy />} />
+          {/* <Route path="*" element={<Navigate to="/" />} /> */}
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
