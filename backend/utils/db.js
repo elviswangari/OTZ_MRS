@@ -33,6 +33,7 @@ class PersonService {
                 .populate('labs')
                 .populate('appointments')
                 .populate('pharmacy');
+            
 
             if (!person) {
                 throw new Error(`Person with CCC Number ${cccNumber} not found`);
