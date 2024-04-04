@@ -1,5 +1,7 @@
 import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
+import { visitData } from '@/visitData';
+import { AppointmentTable } from './Table'
 
   const Appointments = () => {
     return (
@@ -13,6 +15,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/co
               </BreadcrumbList>
             </Breadcrumb>
           </div>
+          <AppointmentTable data={visitData} />
       </DashboardLayout>
     )
   }

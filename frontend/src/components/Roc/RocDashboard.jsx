@@ -1,18 +1,11 @@
 import DashboardLayout from "./DashboardLayout";
 import {
   Card,
-  CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Users,
-  TestTubeDiagonal,
-  CalendarDays,
-  Library,
-  Hand,
-} from "lucide-react";
+import { TestTubeDiagonal, CalendarDays, Library, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
@@ -20,6 +13,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
+// import Charts from './Charts';
 
 const RocDashboard = () => {
   return (
@@ -52,7 +46,6 @@ const RocDashboard = () => {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-2">
-        <div>
         <Card>
           <CardHeader className="grid gap-1">
             <div className="flex items-center space-x-4">
@@ -76,10 +69,10 @@ const RocDashboard = () => {
               </CardTitle>
             </div>
             <CardDescription className="text-sm font-semibold">
-            Date: 23rd March 2024
+              Date: 23rd March 2024
             </CardDescription>
             <CardDescription className="text-sm font-semibold">
-            Results: LDL
+              Results: LDL
             </CardDescription>
           </CardHeader>
         </Card>
@@ -102,65 +95,48 @@ const RocDashboard = () => {
           <CardHeader className="grid gap-1">
             <div className="flex items-center space-x-4">
               <CalendarDays className="align-self-start" />
-              <CardTitle className="text-center font-bold">
-                Regimen
-              </CardTitle>
+              <CardTitle className="text-center font-bold">Regimen</CardTitle>
             </div>
             <CardDescription className="text-sm font-semibold">
               TDF/3TC/DTG
             </CardDescription>
           </CardHeader>
         </Card>
-        </div>
 
-        <Card className="flex justify-center items-center">
-          <CardContent className="flex items-center justify-center flex-col lg:flex-row lg:items-start lg:justify-center">
-            <div className="flex items-center">
-              <CalendarDays className="h-6 w-6" />
-              <div className="ml-2">
-                <CardTitle className="text-center font-bold">
-                  Next OTZ Date
-                </CardTitle>
-                <span className="text-center font-semibold">23rd Dec 2024</span>
-              </div>
+        <Card>
+          <CardHeader className="grid gap-1">
+            <div className="flex items-center space-x-4">
+              <Library className="align-self-start" />
+              <CardTitle className="text-center font-bold">
+                Unfinished Module
+              </CardTitle>
             </div>
-          </CardContent>
+            <CardDescription className="text-center font-semibold">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
+              expedita doloribus quo.
+            </CardDescription>
+            <Button size="sm">Continue module</Button>
+          </CardHeader>
         </Card>
+
         <Card>
-          <CardContent className="flex flex-col items-center">
-            <Library className="h-6 w-6" />
-            <CardTitle className="text-center">Name module</CardTitle>
+          <CardHeader className="grid gap-1">
+            <div className="flex items-center space-x-4">
+              <Library className="align-self-start" />
+              <CardTitle className="text-center font-bold">
+                Completed Modules
+              </CardTitle>
+            </div>
+            <CardDescription className="text-center font-semibold">
+              <a href="#">Introduction</a>
+            </CardDescription>
             <CardDescription className="text-center">
-              A short description about the module.
-              <Button size="sm">Continue module</Button>
-            </CardDescription>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="grid gap-1">
-            <Library className="h-6 w-6" />
-            <CardTitle className="text-sm font-semibold">
-              Completed modules
-            </CardTitle>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="grid gap-1">
-            <TestTubeDiagonal className="h-6 w-6" />
-            <CardTitle className="text-sm font-semibold">Viral Load</CardTitle>
-            <CardDescription className="text-sm font-xs">
-              Chart showing viral load over time
+              <a href="#">Paticipation</a>
             </CardDescription>
           </CardHeader>
         </Card>
-        <Card>
-          <CardHeader className="grid gap-1">
-            <CardTitle className="text-sm font-semibold">Weight</CardTitle>
-            <CardDescription className="text-sm font-xs">
-              Chart showing weight over time
-            </CardDescription>
-          </CardHeader>
-        </Card>
+
+        {/* <Charts /> */}
       </div>
     </DashboardLayout>
   );

@@ -12,7 +12,7 @@ export function SignupForm() {
           alt="Image"
           width="600"
           height="600"
-          className="dark:brightness-[0.2] dark:grayscale"
+        // className="dark:brightness-[0.2] dark:grayscale"
         />
       </div>
       <div className="flex items-center justify-center py-12">

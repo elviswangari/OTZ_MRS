@@ -1,4 +1,5 @@
-import { Bell, Home, Library, Pill, Salad, TestTubeDiagonal, Users, SquareUser, LifeBuoy, CalendarDays, Search } from "lucide-react";
+/* eslint-disable react/prop-types */
+import { Bell, Home, Library, Pill, Salad, TestTubeDiagonal, Users, SquareUser, LifeBuoy, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ const DashboardLayout = ({ children }) => {
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <a href="/" className="flex items-center gap-2 font-semibold">
-              <img src={mohImage} alt="Image" className="h-9 w-9"/>
+              <img src={mohImage} alt="Image" className="h-9 w-9" />
               <span className="">OTZ Module</span>
             </a>
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
@@ -65,14 +66,14 @@ const DashboardLayout = ({ children }) => {
             <form>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="search"  placeholder="Search ..." className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3" />
+                <Input type="search" placeholder="Search ..." className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3" />
               </div>
             </form>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="rounded-full">
-                <img src={mohImage} alt="Image" className="h-6 w-6"/>
+                <img src={mohImage} alt="Image" className="h-6 w-6" />
                 <span className="sr-only">Toggle user menu</span>
               </Button>
             </DropdownMenuTrigger>

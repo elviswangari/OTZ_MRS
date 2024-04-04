@@ -12,7 +12,7 @@ export function LoginForm() {
           alt="Image"
           width="600"
           height="600"
-          className="dark:brightness-[0.2] dark:grayscale"
+        // className="dark:brightness-[0.2] dark:grayscale"
         />
       </div>
       <div className="flex items-center justify-center py-12">
@@ -51,7 +51,7 @@ export function LoginForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <a href="#" className="underline">
+            <a href="/signup" className="underline">
               Sign up
             </a>
           </div>
