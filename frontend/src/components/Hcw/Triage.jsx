@@ -3,7 +3,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/co
 import { TriageTable } from './Table'
 import { visitData } from '@/visitData';
 
-const RocTriage = () => {
+const HcwTriage = () => {
   return (
     <DashboardLayout>
       <div className="flex items-center">
@@ -21,4 +21,4 @@ const RocTriage = () => {
   )
 }
 
-export default RocTriage;
+export default HcwTriage;

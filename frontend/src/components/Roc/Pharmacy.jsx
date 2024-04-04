@@ -3,7 +3,7 @@ import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { PhamacyTable } from './Table'
 
-const Pharmacy = () => {
+const RocPharmacy = () => {
   return (
     <DashboardLayout>
       <div className="flex items-center">
@@ -20,4 +20,4 @@ const Pharmacy = () => {
   )
 }
 
-export default Pharmacy;
+export default RocPharmacy;

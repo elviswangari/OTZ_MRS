@@ -1,7 +1,7 @@
 import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 
-const Modules = () => {
+const RocModules = () => {
   return (
     <DashboardLayout>
       <div className="flex items-center">
@@ -17,4 +17,4 @@ const Modules = () => {
   )
 }
 
-export default Modules;
+export default RocModules;

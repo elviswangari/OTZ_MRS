@@ -3,7 +3,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/co
 import { visitData } from '@/visitData';
 import { AppointmentTable } from './Table'
 
-  const Appointments = () => {
+  const RocAppointments = () => {
     return (
       <DashboardLayout>
         <div className="flex items-center">
@@ -20,4 +20,4 @@ import { AppointmentTable } from './Table'
     )
   }
   
-  export default Appointments;
+  export default RocAppointments;

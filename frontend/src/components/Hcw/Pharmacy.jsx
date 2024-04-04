@@ -1,24 +1,23 @@
+import { visitData } from '@/visitData';
 import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
-import { TriageTable } from './Table'
-import { visitData } from '@/visitData';
+import { PhamacyTable } from './Table'
 
-const RocTriage = () => {
+const HcwPharmacy = () => {
   return (
     <DashboardLayout>
       <div className="flex items-center">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/" className="text-lg font-semibold md:text-2xl">Triage</BreadcrumbLink>
+              <BreadcrumbLink href="/" className="text-lg font-semibold md:text-2xl">Pharmacy</BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      {/* <Tables /> */}
-      <TriageTable data={visitData} />
+      <PhamacyTable data={visitData} />
     </DashboardLayout>
   )
 }
 
-export default RocTriage;
+export default HcwPharmacy;
