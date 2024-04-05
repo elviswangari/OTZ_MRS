@@ -1,17 +1,32 @@
 /* eslint-disable react/prop-types */
+import { useEffect } from 'react';
 import { Bell, Home, Library, Pill, Salad, TestTubeDiagonal, Users, SquareUser, LifeBuoy, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import mohImage from '../../assets/moh.png';
+import useSignOut from 'react-auth-kit/hooks/useSignOut';
+import { useNavigate } from 'react-router-dom';
+import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated'
+
+const route = "/roc"
 
 const DashboardLayout = ({ children }) => {
+  const signOut = useSignOut();
+  const navigate = useNavigate();
+  const isAuthenticated = useIsAuthenticated();
+
+  const handleSignOut = () => {
+    signOut();
+    navigate('/');
+  };
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <a href="/" className="flex items-center gap-2 font-semibold">
+            <a href={`${route}`} className="flex items-center gap-2 font-semibold">
               <img src={mohImage} alt="Image" className="h-9 w-9" />
               <span className="">OTZ Module</span>
             </a>
@@ -22,27 +37,27 @@ const DashboardLayout = ({ children }) => {
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <a href="/" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all bg-muted hover:text-primary">
+              <a href={`${route}`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all bg-muted hover:text-primary">
                 <Home className="h-4 w-4" />
                 Dashboard
               </a>
-              <a href="/triage" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+              <a href={`${route}/triage`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <Salad className="h-4 w-4" />
                 Triage
               </a>
-              <a href="/labs" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+              <a href={`${route}/labs`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <TestTubeDiagonal className="h-4 w-4" />
                 Labs
               </a>
-              <a href="/appointments" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+              <a href={`${route}/appointments`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <Users className="h-4 w-4" />
                 Appointments
               </a>
-              <a href="/modules" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+              <a href={`${route}/modules`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <Library className="h-4 w-4" />
                 Modules
               </a>
-              <a href="/pharmacy" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+              <a href={`${route}/pharmacy`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                 <Pill className="h-4 w-4" />
                 Pharmacy
               </a>
@@ -83,7 +98,7 @@ const DashboardLayout = ({ children }) => {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Routes, Route, Navigate, BrowserRouter as Router } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
+import RequireAuth from '@auth-kit/react-router/RequireAuth';
 import { LoginForm } from '@/components/LoginForm';
 import { SignupForm } from '@/components/SignupForm';
 import { ThemeProvider } from '@/components/Theme/ThemeProvider';
@@ -10,7 +11,6 @@ import RocAppointments from '@/components/Roc/Appointments';
 import RocLabs from '@/components/Roc/Labs';
 import RocModules from '@/components/Roc/Modules';
 import RocPharmacy from '@/components/Roc/Pharmacy';
-
 import HcwDashboard from '@/components/Hcw/HcwDashboard';
 import HcwTriage from '@/components/Hcw/Triage';
 import HcwAppointments from '@/components/Hcw/Appointments';
@@ -19,39 +19,29 @@ import HcwModules from '@/components/Hcw/Modules';
 import HcwPharmacy from '@/components/Hcw/Pharmacy';
 
 function App() {
-  const [userRole, setUserRole] = useState('hcw');
-
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider>
       <Router>
         <ModeToggle />
         <Routes>
-          <Route path="/login" element={<LoginForm />} />
+          {/* Authenticated routes */}
+          <Route path="/roc" element={<RequireAuth fallbackPath="/"><RocDashboard /></RequireAuth>} />
+          <Route path="/roc/triage" element={<RequireAuth fallbackPath="/"><RocTriage /></RequireAuth>} />
+          <Route path="/roc/appointments" element={<RequireAuth fallbackPath="/"><RocAppointments /></RequireAuth>} />
+          <Route path="/roc/labs" element={<RequireAuth fallbackPath="/"><RocLabs /></RequireAuth>} />
+          <Route path="/roc/modules" element={<RequireAuth fallbackPath="/"><RocModules /></RequireAuth>} />
+          <Route path="/roc/pharmacy" element={<RequireAuth fallbackPath="/"><RocPharmacy /></RequireAuth>} />
+
+          <Route path="/hcw" element={<RequireAuth fallbackPath="/"><HcwDashboard /></RequireAuth>} />
+          <Route path="/hcw/triage" element={<RequireAuth fallbackPath="/"><HcwTriage /></RequireAuth>} />
+          <Route path="/hcw/appointments" element={<RequireAuth fallbackPath="/"><HcwAppointments /></RequireAuth>} />
+          <Route path="/hcw/labs" element={<RequireAuth fallbackPath="/"><HcwLabs /></RequireAuth>} />
+          <Route path="/hcw/modules" element={<RequireAuth fallbackPath="/"><HcwModules /></RequireAuth>} />
+          <Route path="/hcw/pharmacy" element={<RequireAuth fallbackPath="/"><HcwPharmacy /></RequireAuth>} />
+
+          {/* Public routes */}
           <Route path="/signup" element={<SignupForm />} />
-          {/* ROC Routes */}
-          {userRole === 'roc' && (
-            <>
-              <Route path="/" element={<RocDashboard />} />
-              <Route path="/triage" element={<RocTriage />} />
-              <Route path="/appointments" element={<RocAppointments />} />
-              <Route path="/labs" element={<RocLabs />} />
-              <Route path="/modules" element={<RocModules />} />
-              <Route path="/pharmacy" element={<RocPharmacy />} />
-            </>
-          )}
-          {/* HCW Routes */}
-          {userRole === 'hcw' && (
-            <>
-              <Route path="/" element={<HcwDashboard />} />
-              <Route path="/triage" element={<HcwTriage />} />
-              <Route path="/appointments" element={<HcwAppointments />} />
-              <Route path="/labs" element={<HcwLabs />} />
-              <Route path="/modules" element={<HcwModules />} />
-              <Route path="/pharmacy" element={<HcwPharmacy />} />
-            </>
-          )}
-          {/* Default Route */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/" element={<LoginForm />} />
         </Routes>
       </Router>
     </ThemeProvider>

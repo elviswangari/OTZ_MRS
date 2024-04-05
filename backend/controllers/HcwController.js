@@ -3,6 +3,10 @@ import { internalError } from '../utils/errors.js';
 // import { redisClient } from '../utils/redis.js';
 import Excel from 'exceljs';
 
+const capitalizeFirstLetter = (str)  =>  {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
 const home = async (req, res) => {
     try {
         const people = await Roc.findAllPersons();
@@ -51,11 +55,12 @@ const registerRoc = async (req, res) => {
             dateStartedArt,
         } = req.body;
 
-        // Create ROC record
-        const rocData = {
-            firstName,
-            lastName,
-            surname,
+                  
+          // Create ROC record
+          const rocData = {
+            firstName: capitalizeFirstLetter(firstName.toUpperCase()),
+            lastName: capitalizeFirstLetter(lastName.toUpperCase()),
+            surname: capitalizeFirstLetter(surname.toUpperCase()),
             dateOfBirth,
             gender,
             residence,
@@ -65,11 +70,11 @@ const registerRoc = async (req, res) => {
             dateEnrolledIntoCare,
             dateStartedArt,
             dateEnrolledIntoOTZ,
-            work,
-            school,
-            schoolName,
+            work: work.toUpperCase(),
+            school: school.toUpperCase(),
+            schoolName: schoolName.toUpperCase(),
             schoolLevel,
-        };
+          };
 
         const newRoc = await Roc.createPerson(rocData);
 
@@ -105,9 +110,9 @@ const updateRocRecord = async (req, res) => {
 
         // Create ROC record
         const rocData = {
-            firstName,
-            lastName,
-            surname,
+            firstName: capitalizeFirstLetter(firstName.toUpperCase()),
+            lastName: capitalizeFirstLetter(lastName.toUpperCase()),
+            surname: capitalizeFirstLetter(surname.toUpperCase()),
             dateOfBirth,
             gender,
             residence,
@@ -117,9 +122,9 @@ const updateRocRecord = async (req, res) => {
             dateEnrolledIntoCare,
             dateStartedArt,
             dateEnrolledIntoOTZ,
-            work,
-            school,
-            schoolName,
+            work: work.toUpperCase(),
+            school: school.toUpperCase(),
+            schoolName: schoolName.toUpperCase(),
             schoolLevel,
         };
 

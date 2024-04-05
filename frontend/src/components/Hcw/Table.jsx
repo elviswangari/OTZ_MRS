@@ -33,6 +33,14 @@ const TriageTable = ({ data }) => {
                                         <TableCell>Height</TableCell>
                                         <TableCell>{item.height} cms</TableCell>
                                     </TableRow>
+                                    <TableRow>
+                                        <TableCell>Weight</TableCell>
+                                        <TableCell>{item.weight} Kgs</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell>Blood pressuer</TableCell>
+                                        <TableCell>{item.bloodPressure} cms</TableCell>
+                                    </TableRow>
                                 </TableBody>
                             </Table>
                         </TableCell>
