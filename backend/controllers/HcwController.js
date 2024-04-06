@@ -58,9 +58,9 @@ const registerRoc = async (req, res) => {
                   
           // Create ROC record
           const rocData = {
-            firstName: capitalizeFirstLetter(firstName.toUpperCase()),
-            lastName: capitalizeFirstLetter(lastName.toUpperCase()),
-            surname: capitalizeFirstLetter(surname.toUpperCase()),
+            firstName,
+            lastName,
+            surname,
             dateOfBirth,
             gender,
             residence,
@@ -70,11 +70,11 @@ const registerRoc = async (req, res) => {
             dateEnrolledIntoCare,
             dateStartedArt,
             dateEnrolledIntoOTZ,
-            work: work.toUpperCase(),
-            school: school.toUpperCase(),
-            schoolName: schoolName.toUpperCase(),
+            work,
+            school,
+            schoolName,
             schoolLevel,
-          };
+        };
 
         const newRoc = await Roc.createPerson(rocData);
 
@@ -110,9 +110,9 @@ const updateRocRecord = async (req, res) => {
 
         // Create ROC record
         const rocData = {
-            firstName: capitalizeFirstLetter(firstName.toUpperCase()),
-            lastName: capitalizeFirstLetter(lastName.toUpperCase()),
-            surname: capitalizeFirstLetter(surname.toUpperCase()),
+            firstName,
+            lastName,
+            surname,
             dateOfBirth,
             gender,
             residence,
@@ -122,9 +122,9 @@ const updateRocRecord = async (req, res) => {
             dateEnrolledIntoCare,
             dateStartedArt,
             dateEnrolledIntoOTZ,
-            work: work.toUpperCase(),
-            school: school.toUpperCase(),
-            schoolName: schoolName.toUpperCase(),
+            work,
+            school,
+            schoolName,
             schoolLevel,
         };
 

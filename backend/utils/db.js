@@ -4,14 +4,23 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { setAuthToken, getAuthToken } from './redis.js';
 
+const capitalizeFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 class PersonService {
     constructor() {
         this.Person = mongoose.model('Person', Person.schema);
     }
     async createPerson(personData) {
-        const { cccNumber } = personData;
-
         try {
+            const { cccNumber } = personData;
+            const fields = ['firstName', 'lastName', 'surname', 'work', 'schoolName', 'gender', 'residence'];
+
+            fields.forEach(field => {
+                if (personData[field] !== undefined) {
+                    personData[field] = capitalizeFirstLetter(personData[field]);
+                }
+            });
             const existingPerson = await this.Person.findOne({ cccNumber });
 
             if (existingPerson) {
@@ -33,7 +42,7 @@ class PersonService {
                 .populate('labs')
                 .populate('appointments')
                 .populate('pharmacy');
-            
+
 
             if (!person) {
                 throw new Error(`Person with CCC Number ${cccNumber} not found`);
@@ -111,6 +120,13 @@ class VitalsService {
     }
     async updateVitalsForPerson(cccNumber, vitalId, updatedData) {
         try {
+            const fields = ['firstName', 'lastName', 'surname', 'work', 'schoolName', 'gender', 'residence'];
+
+            fields.forEach(field => {
+                if (updatedData[field] !== undefined) {
+                    updatedData[field] = capitalizeFirstLetter(updatedData[field]);
+                }
+            });
             // Find the person by CCC number
             const person = await this.Person.findOne({ cccNumber });
             if (!person) {
