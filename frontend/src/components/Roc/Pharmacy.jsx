@@ -1,9 +1,24 @@
-import { visitData } from '@/visitData';
+import { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
-import { PhamacyTable } from './Table'
+import { PharmacyTable } from './Table'
+import { getRequest } from '@/Axios';
 
 const RocPharmacy = () => {
+  const [visitData, setVisitData] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getRequest('roc/pharmacy');
+        setVisitData(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    fetchData();
+  }, []);
   return (
     <DashboardLayout>
       <div className="flex items-center">
@@ -15,7 +30,7 @@ const RocPharmacy = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <PhamacyTable data={visitData} />
+      <PharmacyTable data={visitData} />
     </DashboardLayout>
   )
 }

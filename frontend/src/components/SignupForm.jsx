@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import mohImage from '../assets/moh.png';
-import { postRequest } from '../Axios';
+// import { postRequestNoHeader } from '../Axios';
+import { postRequestNoHeader } from '@/Axios';
 import { useNavigate } from 'react-router-dom';
 import useSignIn from 'react-auth-kit/hooks/useSignIn';
 
@@ -28,7 +29,7 @@ export function SignupForm() {
       return;
     }
     try {
-      const response = await postRequest('register', { firstName, cccNumber, email, phoneNumber, password });
+      const response = await postRequestNoHeader('register', { firstName, cccNumber, email, phoneNumber, password });
       if (response && response.token) {
         signIn({
           auth: {
@@ -56,7 +57,7 @@ export function SignupForm() {
 
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-      <div className="hidden lg:block rounded-lg flex items-center justify-center py-12">
+      <div className="hidden lg:block rounded-lg items-center justify-center py-12">
         <img
           src={mohImage}
           alt="Image"

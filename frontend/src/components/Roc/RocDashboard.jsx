@@ -14,8 +14,47 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 // import Charts from './Charts';
+import { useState, useEffect } from 'react';
+import { getRequest } from '@/Axios';
 
 const RocDashboard = () => {
+  const [personData, setPersonData] = useState(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getRequest('roc');
+        setPersonData(data.details);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // Check if personData is not null to avoid errors
+  if (!personData) {
+    return <div>Loading...</div>;
+  }
+
+  // Destructure the required data from personData
+  const { labs, appointments, pharmacy } = personData;
+
+  // Find the latest viral load
+  const latestViralLoad = labs.length > 0 ? labs.reduce((latest, lab) => {
+    return new Date(lab.createdAt) > new Date(latest.createdAt) ? lab : latest;
+  }) : null;
+
+  // Find the next appointment
+  const nextAppointment = appointments.length > 0 ? appointments.reduce((latest, appointment) => {
+    return new Date(appointment.createdAt) > new Date(latest.createdAt) ? appointment : latest;
+  }) : null;
+
+  // Find the latest regimen
+  const latestRegimen = pharmacy.length > 0 ? pharmacy.reduce((latest, regimen) => {
+    return new Date(regimen.createdAt) > new Date(latest.createdAt) ? regimen : latest;
+  }) : null;
   return (
     <DashboardLayout>
       <div className="flex items-center">
@@ -37,7 +76,7 @@ const RocDashboard = () => {
           <CardHeader className="grid gap-1">
             <div className="flex items-center space-x-4">
               <CardTitle className="text-center font-bold">
-                Hello Elvis
+                Hello {personData.firstName}
               </CardTitle>
               <Hand />
             </div>
@@ -69,10 +108,10 @@ const RocDashboard = () => {
               </CardTitle>
             </div>
             <CardDescription className="text-sm font-semibold">
-              Date: 23rd March 2024
+              Date: {new Date(latestViralLoad.viralLoadDate).toLocaleDateString('en-GB')}
             </CardDescription>
             <CardDescription className="text-sm font-semibold">
-              Results: LDL
+              Results: {latestViralLoad.viralLoad}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -86,7 +125,7 @@ const RocDashboard = () => {
               </CardTitle>
             </div>
             <CardDescription className="text-sm font-semibold">
-              23rd June 2024
+              {new Date(nextAppointment.nextVisitDay).toLocaleDateString('en-GB')}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -98,7 +137,7 @@ const RocDashboard = () => {
               <CardTitle className="text-center font-bold">Regimen</CardTitle>
             </div>
             <CardDescription className="text-sm font-semibold">
-              TDF/3TC/DTG
+              {latestRegimen.regimen}
             </CardDescription>
           </CardHeader>
         </Card>

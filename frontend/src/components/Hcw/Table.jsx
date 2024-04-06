@@ -93,7 +93,7 @@ const LabsTable = ({ data }) => {
     );
 }
 
-const PhamacyTable = ({ data }) => {
+const PharmacyTable = ({ data }) => {
     return (
         <Table>
             <TableHead>
@@ -113,4 +113,4 @@ const PhamacyTable = ({ data }) => {
         </Table >
     );
 }
-export { TriageTable, LabsTable, AppointmentTable, PhamacyTable };
+export { TriageTable, LabsTable, AppointmentTable, PharmacyTable };

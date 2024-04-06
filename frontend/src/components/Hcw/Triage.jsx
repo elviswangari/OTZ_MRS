@@ -1,7 +1,7 @@
 import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { TriageTable } from './Table'
-import { visitData } from '@/visitData';
+// import { visitData } from '@/visitData';
 
 const HcwTriage = () => {
   return (

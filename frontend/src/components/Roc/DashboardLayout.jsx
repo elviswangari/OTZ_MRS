@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { Bell, Home, Library, Pill, Salad, TestTubeDiagonal, Users, SquareUser, LifeBuoy, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -7,14 +7,12 @@ import { Input } from "@/components/ui/input";
 import mohImage from '../../assets/moh.png';
 import useSignOut from 'react-auth-kit/hooks/useSignOut';
 import { useNavigate } from 'react-router-dom';
-import useIsAuthenticated from 'react-auth-kit/hooks/useIsAuthenticated'
 
 const route = "/roc"
 
 const DashboardLayout = ({ children }) => {
   const signOut = useSignOut();
   const navigate = useNavigate();
-  const isAuthenticated = useIsAuthenticated();
 
   const handleSignOut = () => {
     signOut();
@@ -37,7 +35,7 @@ const DashboardLayout = ({ children }) => {
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <a href={`${route}`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all bg-muted hover:text-primary">
+              <a href={`${route}`} className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all bg-mutedd hover:text-primary">
                 <Home className="h-4 w-4" />
                 Dashboard
               </a>

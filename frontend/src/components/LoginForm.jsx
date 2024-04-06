@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+/* eslint-disable react/no-unescaped-entities */
+import { useState } from 'react';
 import useSignIn from 'react-auth-kit/hooks/useSignIn';
-import { postRequest } from '../Axios';
+// import { postRequestNoHeader } from '../Axios';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import mohImage from '../assets/moh.png';
+import { postRequestNoHeader } from '@/Axios';
+
 
 export function LoginForm() {
   const signIn = useSignIn();
@@ -14,12 +17,13 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await postRequest('login', { identifier, password });
+      const response = await postRequestNoHeader('login', { identifier, password });
       if (response && response.token && response.role) {
         signIn({
           auth: {
@@ -50,7 +54,7 @@ export function LoginForm() {
 
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-      <div className="hidden lg:block rounded-lg flex items-center justify-center py-12">
+      <div className="hidden lg:block rounded-lg items-center justify-center py-12">
         <img
           src={mohImage}
           alt="Image"
