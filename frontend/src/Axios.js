@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 const BASE_URL = 'http://localhost:3001';
 
 const token = Cookies.get('_auth');
-// const token = ''
+// const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjBmOThjZjY5NWE4NmM5ZGMyOTAzOWUiLCJpYXQiOjE3MTI0NjcyOTgsImV4cCI6MTcxMjQ3MDg5OH0.jcs5VqBIqj9il86AlvG33S-bNJig-1hh25XR2FHoB90'
 // const role = Cookies.get('_auth_state');
 
 const headers = {
