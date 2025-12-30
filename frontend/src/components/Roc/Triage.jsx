@@ -1,24 +1,17 @@
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import DashboardLayout from './DashboardLayout';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { TriageTable } from './Table';
-import { getRequest } from '@/Axios';
+// import { getRequest } from '@/Axios';
+  import { useVisitData } from '@/visitData';
+  import { Skeleton } from "@/components/ui/skeleton"
 
 const RocTriage = () => {
-  const [visitData, setVisitData] = useState(null);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const data = await getRequest('roc/triage');
-        setVisitData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-
-    fetchData();
-  }, []);
+  const { visitData, loading } = useVisitData('roc/triage');
+  // Render skeleton if loading or visitData is not available
+  if (loading || !visitData || !visitData.details) {
+    return <Skeleton />;
+  }
 
   return (
     <DashboardLayout>
