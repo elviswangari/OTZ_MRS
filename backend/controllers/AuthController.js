@@ -39,6 +39,8 @@ const login = async (req, res) => {
             token: authResult.token,
             userId: authResult.userId,
             role: authResult.role,
+            firstName: authResult.firstName,
+            email: authResult.email,
         });
     } catch (error) {
         // Log the error for debugging purposes (don't expose sensitive details)

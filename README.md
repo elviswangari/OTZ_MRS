@@ -32,7 +32,7 @@ The project is built using a modern full-stack architecture:
 - **Content Management**: Create, update, and manage educational modules for patients.
 - **User Management**: Administer HCW accounts and roles.
 
-### 👤 Patient (ROC - Retention of Care) Dashboard
+### 👤 Patient (ROC - Recipient of Care) Dashboard
 - **Personal Health Record**: Secure access to personal clinical data.
 - **Vitals Tracking**: View historical weight, height, and BP trends.
 - **Lab Results**: Access Viral Load results and dates.

@@ -53,6 +53,38 @@ class PersonService {
         }
     }
 
+    async searchPerson(query) {
+        try {
+            const isNumeric = !isNaN(query);
+            let filter = {};
+
+            if (isNumeric) {
+                filter = {
+                    $or: [
+                        { cccNumber: Number(query) },
+                        { phoneNumber: query }
+                    ]
+                };
+            } else {
+                filter = {
+                    $or: [
+                        { firstName: { $regex: query, $options: 'i' } },
+                        { lastName: { $regex: query, $options: 'i' } },
+                        { surname: { $regex: query, $options: 'i' } }
+                    ]
+                };
+            }
+
+            return await this.Person.find(filter)
+                .populate('vitals')
+                .populate('labs')
+                .populate('appointments')
+                .populate('pharmacy');
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async updatePersonByCCCNumber(cccNumber, updatedData) {
         try {
             return await Person.findOneAndUpdate({ cccNumber }, updatedData, { new: true });
@@ -169,6 +201,14 @@ class VitalsService {
             }
 
             return true;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async findAllVitals() {
+        try {
+            return await this.Vitals.find({});
         } catch (error) {
             throw error;
         }
@@ -350,6 +390,14 @@ class AppointmentsService {
             throw error;
         }
     }
+
+    async findAllAppointments() {
+        try {
+            return await this.Appointments.find({});
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 class PharmacyService {
@@ -435,6 +483,14 @@ class PharmacyService {
             return true;
         } catch (error) {
             console.error(error);
+            throw error;
+        }
+    }
+
+    async findAllPharmacies() {
+        try {
+            return await this.Pharmacy.find({});
+        } catch (error) {
             throw error;
         }
     }
@@ -635,20 +691,24 @@ class CommonService {
 
             // Use the appropriate model to get user ID
             // Use the appropriate model to get user ID and role
-            let userId, role;
+            let userId, role, firstName, email;
             if (user) {
                 userId = user._id;
                 role = 'roc';
+                firstName = user.firstName;
+                email = user.email;
             } else if (hcw) {
                 userId = hcw._id;
                 role = 'hcw';
+                firstName = hcw.firstName;
+                email = hcw.email;
             }
 
             // Check if a valid token exists in the cache
             const existingToken = await getAuthToken(userId);
 
             if (existingToken) {
-                return { token: existingToken, role };
+                return { token: existingToken, userId, role, firstName, email };
             } else {
                 // After successful login, generate an authentication token
                 const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
@@ -656,7 +716,7 @@ class CommonService {
                 // Store the authentication token in the cache
                 setAuthToken(token, userId);
 
-                return { token, userId, role };
+                return { token, userId, role, firstName, email };
             }
         } catch (error) {
             throw error;

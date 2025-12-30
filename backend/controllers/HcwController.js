@@ -3,9 +3,9 @@ import { internalError } from '../utils/errors.js';
 // import { redisClient } from '../utils/redis.js';
 import Excel from 'exceljs';
 
-const capitalizeFirstLetter = (str)  =>  {
+const capitalizeFirstLetter = (str) => {
     return str.replace(/\b\w/g, (char) => char.toUpperCase());
-  }
+}
 
 const home = async (req, res) => {
     try {
@@ -32,6 +32,42 @@ const getNoOfUser = async (req, res) => {
     res.status(200).json({ users })
 };
 
+const getAllVitals = async (req, res) => {
+    try {
+        const vitals = await Triage.findAllVitals();
+        res.status(200).json(vitals);
+    } catch (error) {
+        internalError(error, res);
+    }
+};
+
+const getAllLabs = async (req, res) => {
+    try {
+        const labs = await LabOrders.findAllLabs();
+        res.status(200).json(labs);
+    } catch (error) {
+        internalError(error, res);
+    }
+};
+
+const getAllAppointments = async (req, res) => {
+    try {
+        const appointments = await AppointmentDir.findAllAppointments();
+        res.status(200).json(appointments);
+    } catch (error) {
+        internalError(error, res);
+    }
+};
+
+const getAllPharmacy = async (req, res) => {
+    try {
+        const pharmacy = await PharmacyDir.findAllPharmacies();
+        res.status(200).json(pharmacy);
+    } catch (error) {
+        internalError(error, res);
+    }
+};
+
 // register new person
 const registerRoc = async (req, res) => {
     try {
@@ -55,9 +91,9 @@ const registerRoc = async (req, res) => {
             dateStartedArt,
         } = req.body;
 
-                  
-          // Create ROC record
-          const rocData = {
+
+        // Create ROC record
+        const rocData = {
             firstName,
             lastName,
             surname,
@@ -226,19 +262,22 @@ const deleteVitals = async (req, res) => {
 //find persons records
 const getRocRecord = async (req, res) => {
     try {
-        const { cccNumber } = req.body;
-        const rocRecord = await Roc.findPersonByCCCNumber(cccNumber);
-        // const redisRec = await redisClient.getAuthToken(req.headers.authorization);
-        if (rocRecord) {
-            res.status(200).json({
-                rocRecord,
-                // redisRec,
-            });
-        } else {
-            res.status(404).json({
-                message: 'ROC record not found',
-            });
+        const { cccNumber, query } = req.body;
+
+        if (cccNumber) {
+            const rocRecord = await Roc.findPersonByCCCNumber(cccNumber);
+            if (rocRecord) {
+                return res.status(200).json({ rocRecord });
+            }
+            return res.status(404).json({ message: 'ROC record not found' });
         }
+
+        if (query) {
+            const results = await Roc.searchPerson(query);
+            return res.status(200).json({ results });
+        }
+
+        res.status(400).json({ message: 'Search query or CCC number required' });
     } catch (error) {
         internalError(error, res);
     }
@@ -876,6 +915,10 @@ const viralLoad = async (req, res) => {
 export {
     home,
     getNoOfUser,
+    getAllVitals,
+    getAllLabs,
+    getAllAppointments,
+    getAllPharmacy,
     registerRoc,
     updateRocRecord,
     newVitals,

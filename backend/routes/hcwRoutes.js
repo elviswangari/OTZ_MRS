@@ -1,7 +1,7 @@
 /* eslint-disable jest/require-hook */
 import { Router } from 'express';
 import { getStats, getStatus, } from '../controllers/AppController.js';
-import { home, getNoOfUser, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment, newHcwAccount, updateHcwAccount, newModule, updateModule, deleteModule, allReports, otzMonthly, stf, viralLoad } from '../controllers/HcwController.js';
+import { home, getNoOfUser, getAllVitals, getAllLabs, getAllAppointments, getAllPharmacy, registerRoc, updateRocRecord, newVitals, updateVitals, deleteVitals, getRocRecord, newLabOrder, updateLabOrder, deleteLabOrder, newPharmacyOrder, updatePharmacyOrder, deletePharmacyOrder, newAppointment, updateAppointment, deleteAppointment, newHcwAccount, updateHcwAccount, newModule, updateModule, deleteModule, allReports, otzMonthly, stf, viralLoad } from '../controllers/HcwController.js';
 
 const hcwRoutes = Router();
 
@@ -9,6 +9,10 @@ hcwRoutes.get('/', home)
   .get('/status', getStatus)
   .get('/stats', getStats)
   .get('/users', getNoOfUser)
+  .get('/triage', getAllVitals)
+  .get('/labs', getAllLabs)
+  .get('/appointments', getAllAppointments)
+  .get('/pharmacy', getAllPharmacy)
   .post('/search', getRocRecord)
   .post('/registration', registerRoc)
   .put('/registration', updateRocRecord);
